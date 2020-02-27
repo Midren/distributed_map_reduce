@@ -1,12 +1,12 @@
 #ifndef MAP_REDUCE_MAPBASE_H
 #define MAP_REDUCE_MAPBASE_H
 
-#include "ValueType.h"
+#include "types/KeyValueType.h"
 #include <bits/unique_ptr.h>
 
 class MapBase {
 public:
-    virtual std::unique_ptr<ValueType> map(const std::unique_ptr<ValueType> &value) = 0;
+    virtual std::unique_ptr<KeyValueType> map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) = 0;
 };
 
 

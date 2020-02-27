@@ -3,11 +3,11 @@
 
 #include <bits/unique_ptr.h>
 #include <vector>
-#include "ValueType.h"
+#include "types/KeyValueType.h"
 
 class ReduceBase {
 public:
-    virtual std::unique_ptr<ValueType> reduce(const std::vector<std::unique_ptr<ValueType>> &inputs) = 0;
+    virtual std::unique_ptr<KeyValueType> reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &inputs) = 0;
 };
 
 
