@@ -19,18 +19,20 @@ int main() {
     std::vector<int> real_inputs(4);
     std::iota(real_inputs.begin(), real_inputs.end(), 0);
     std::vector<std::unique_ptr<KeyValueType>> keys, inputs;
-    std::transform(real_inputs.begin(), real_inputs.end(), std::back_inserter(inputs), [](const auto &x) {
-        return std::make_unique<IntKeyValueType>(x);
-    });
     std::transform(real_inputs.begin(), real_inputs.end(), std::back_inserter(keys), [](const auto &x) {
         return std::make_unique<IntKeyValueType>(0);
+    });
+    std::transform(real_inputs.begin(), real_inputs.end(), std::back_inserter(inputs), [](const auto &x) {
+        return std::make_unique<IntKeyValueType>(x);
     });
 
     std::vector<std::unique_ptr<KeyValueType>> outputs;
     std::transform(keys.begin(), keys.end(), inputs.begin(), std::back_inserter(outputs),
-                   std::bind(&MapBase::map, cfg->getMapClass(), std::placeholders::_1, std::placeholders::_2));
+                   [&](const auto &key, const auto &value) {
+                       return cfg->getMapClass()->map(key, value).second;
+                   });
 
-    std::cout << dynamic_cast<IntKeyValueType *>(cfg->getReduceClass()->reduce(keys[0], outputs).get())->value;
+    std::cout << dynamic_cast<IntKeyValueType *>(cfg->getReduceClass()->reduce(keys[0], outputs).second.get())->value;
     dlclose(library_handler);
 
     return 0;

@@ -3,19 +3,24 @@
 
 class SquareMap : public MapBase {
 public:
-    std::unique_ptr<KeyValueType> map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
+    std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
         const auto input_value = dynamic_cast<IntKeyValueType *>(value.get());
-        return std::make_unique<IntKeyValueType>(input_value->value * input_value->value);
+        return {std::make_unique<IntKeyValueType>(dynamic_cast<IntKeyValueType *>(key.get())->value),
+                std::make_unique<IntKeyValueType>(input_value->value * input_value->value)};
     };
 };
 
 class SumReduce : public ReduceBase {
 public:
-    std::unique_ptr<KeyValueType> reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &outputs) override {
-        return std::make_unique<IntKeyValueType>(
-                std::accumulate(outputs.begin(), outputs.end(), 0, [](int &lhs, const auto &rhs) {
-                    return lhs += dynamic_cast<IntKeyValueType *>(rhs.get())->value;
-                }));
+    std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    reduce(const std::unique_ptr<KeyValueType> &key,
+           const std::vector<std::unique_ptr<KeyValueType>> &outputs) override {
+        return {std::make_unique<IntKeyValueType>(dynamic_cast<IntKeyValueType *>(key.get())->value),
+                std::make_unique<IntKeyValueType>(
+                        std::accumulate(outputs.begin(), outputs.end(), 0, [](int &lhs, const auto &rhs) {
+                            return lhs += dynamic_cast<IntKeyValueType *>(rhs.get())->value;
+                        }))};
     }
 };
 

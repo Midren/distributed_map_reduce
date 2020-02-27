@@ -7,7 +7,8 @@
 
 class ReduceBase {
 public:
-    virtual std::unique_ptr<KeyValueType> reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &inputs) = 0;
+    virtual std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &inputs) = 0;
 };
 
 

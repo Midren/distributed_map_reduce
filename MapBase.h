@@ -6,7 +6,8 @@
 
 class MapBase {
 public:
-    virtual std::unique_ptr<KeyValueType> map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) = 0;
+    virtual std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) = 0;
 };
 
 
