@@ -8,11 +8,11 @@ FIND_PACKAGE(Boost COMPONENTS system filesystem REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(SSH_Node)
+include_directories(ssh_node)
 
 add_library(map_reduce_config SHARED configurator/JobConfig.cpp)
 
-add_executable(map_reduce main.cpp SSH_Node/Scp.cpp SSH_Node/Node.cpp types/KeyValueTypeFactory.cpp)
+add_executable(map_reduce main.cpp ssh_node/Scp.cpp ssh_node/Node.cpp types/KeyValueTypeFactory.cpp)
 add_executable(map_server map_server.cpp types/KeyValueTypeFactory.cpp)
 add_executable(reduce_server reduce_server.cpp types/KeyValueTypeFactory.cpp)
 
