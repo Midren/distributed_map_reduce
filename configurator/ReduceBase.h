@@ -3,7 +3,7 @@
 
 #include <bits/unique_ptr.h>
 #include <vector>
-#include "types/KeyValueType.h"
+#include "../types/KeyValueType.h"
 
 class ReduceBase {
 public:

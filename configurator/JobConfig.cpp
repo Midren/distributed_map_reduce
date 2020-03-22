@@ -1,5 +1,5 @@
 #include <numeric>
-#include "JobConf.h"
+#include "JobConfig.h"
 
 class SquareMap : public MapBase {
 public:
@@ -18,14 +18,22 @@ public:
            const std::vector<std::unique_ptr<KeyValueType>> &outputs) override {
         return {std::make_unique<IntKeyValueType>(dynamic_cast<IntKeyValueType *>(key.get())->value),
                 std::make_unique<IntKeyValueType>(
-                        std::accumulate(outputs.begin(), outputs.end(), 0, [](int &lhs, const auto &rhs) {
-                            return lhs += dynamic_cast<IntKeyValueType *>(rhs.get())->value;
+                        std::accumulate(outputs.begin(), outputs.end(), 0, [](int lhs, const auto &rhs) {
+                            return lhs + dynamic_cast<IntKeyValueType *>(rhs.get())->value;
                         }))};
     }
 };
 
-JobConf *get_config() {
+JobConfig *get_config() {
     return &job_config;
 }
 
-JobConf job_config = JobConf("sum of squares", std::make_unique<SquareMap>(), std::make_unique<SumReduce>());
+JobConfig job_config = JobConfig("sum of squares",
+                                 std::make_unique<SquareMap>(),
+                                 std::make_unique<SumReduce>(),
+                                 std::make_unique<IntKeyValueTypeFactory>(),
+                                 std::make_unique<IntKeyValueTypeFactory>(),
+                                 std::make_unique<IntKeyValueTypeFactory>(),
+                                 std::make_unique<IntKeyValueTypeFactory>(),
+                                 std::make_unique<IntKeyValueTypeFactory>()
+);

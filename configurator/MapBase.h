@@ -1,7 +1,7 @@
 #ifndef MAP_REDUCE_MAPBASE_H
 #define MAP_REDUCE_MAPBASE_H
 
-#include "types/KeyValueType.h"
+#include "../types/KeyValueType.h"
 #include <bits/unique_ptr.h>
 
 class MapBase {
