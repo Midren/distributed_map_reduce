@@ -4,13 +4,14 @@
 #include <functional>
 
 #include "dlfcn.h"
-#include "JobConf.h"
+#include "configurator/JobConfig.h"
 
 int main() {
-    auto library_handler = dlopen("libmap_reduce_configurator.so", RTLD_LAZY);
+    auto library_handler = dlopen("libmap_reduce_config.so", RTLD_LAZY);
 
     if (library_handler == nullptr) {
-        std::cout << "Cannot open shared library: " << dlerror() << std::endl;
+        std::cerr << dlerror() << std::endl;
+        return 1;
     }
 
     auto get_cfg = (get_config_t) dlsym(library_handler, "get_config");
@@ -29,10 +30,10 @@ int main() {
     std::vector<std::unique_ptr<KeyValueType>> outputs;
     std::transform(keys.begin(), keys.end(), inputs.begin(), std::back_inserter(outputs),
                    [&](const auto &key, const auto &value) {
-                       return cfg->getMapClass()->map(key, value).second;
+                       return cfg->map_class->map(key, value).second;
                    });
 
-    std::cout << dynamic_cast<IntKeyValueType *>(cfg->getReduceClass()->reduce(keys[0], outputs).second.get())->value;
+    std::cout << dynamic_cast<IntKeyValueType *>(cfg->reduce_class->reduce(keys[0], outputs).second.get())->value;
     dlclose(library_handler);
 
     return 0;
