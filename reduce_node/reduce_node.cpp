@@ -1,11 +1,12 @@
 #include <boost/asio.hpp>
 
-#include "server.h"
+#include "../json_server.h"
+#include "reduce.h"
 
 int main() {
     boost::asio::io_context io_service;
 
-    server s(io_service, 8001);
+    JsonServer s(io_service, 8001, process);
 
     io_service.run();
 

@@ -16,7 +16,10 @@ struct ptr_less {
     }
 };
 
+//TODO: add hash method for KeyValueType and replace to TBD concurrent_hashmap instead of map + mutex
 std::map<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>, ptr_less<std::unique_ptr<KeyValueType>>> key_values;
+std::mutex map_mutex;
+
 ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>> queue;
 
 constexpr int map_cnt = 4;

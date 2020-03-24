@@ -1,9 +1,9 @@
 #include <fstream>
 #include <filesystem>
 
-#include "util.h"
-#include "configurator/JobConfig.h"
-#include "configurator/config.h"
+#include "../util.h"
+#include "../configurator/JobConfig.h"
+#include "../configurator/config.h"
 
 #include <boost/asio.hpp>
 
