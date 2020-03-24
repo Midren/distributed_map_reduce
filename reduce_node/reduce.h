@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "concurrent_queue.h"
 #include "../configurator/JobConfig.h"
 #include "../configurator/config.h"
 #include "../util.h"
@@ -16,8 +17,20 @@ struct ptr_less {
 };
 
 std::map<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>, ptr_less<std::unique_ptr<KeyValueType>>> key_values;
+ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>> queue;
 
 constexpr int map_cnt = 4;
+
+
+void
+reduce(ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>> &q) {
+    auto library_handler = get_config_dll_handler("libmap_reduce_config.so");
+    auto cfg = get_config(library_handler);
+    auto[key, values] = q.pop();
+    auto[key_out, value_out] = cfg->reduce_class->reduce(key, values);
+    std::cout << key_out->to_string() << " " << value_out->to_string() << std::endl;
+    //TODO: Add sending to master node result
+}
 
 void process(const std::string &json) {
     auto library_handler = get_config_dll_handler("libmap_reduce_config.so");
@@ -28,7 +41,7 @@ void process(const std::string &json) {
         if (map_cnt == 1) {
             auto values = std::vector<std::unique_ptr<KeyValueType>>{};
             values.push_back(std::move(value));
-            //TODO: push values to thread-safe queue
+            queue.push(make_pair(std::move(key), std::move(values)));
         } else {
             key_values[std::move(key)].push_back(std::move(value));
         }
@@ -37,14 +50,13 @@ void process(const std::string &json) {
             auto values = std::move(it->second);
             values.push_back(std::move(value));
             key_values.erase(it);
-            for (auto &item : values)
-                std::cout << item->to_string() << std::endl;
-            //TODO: push values to thread-safe queue
+            queue.push(make_pair(std::move(key), std::move(values)));
+            //TODO: make actually concurrent
+            reduce(queue);
         } else {
             key_values[std::move(key)].push_back(std::move(value));
         }
     }
-//    values[key].push_back(std::move(value));
 }
 
 #endif //MAP_REDUCE_REDUCE_H
