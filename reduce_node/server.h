@@ -1,10 +1,8 @@
-#include <iostream>
-
-#include "../util.h"
-#include "../types/KeyValueType.h"
-#include "reduce.h"
-
+#ifndef MAP_REDUCE_REDUCE_SERVER_H
+#define MAP_REDUCE_REDUCE_SERVER_H
 #include <boost/asio.hpp>
+
+#include "reduce.h"
 
 using boost::asio::ip::tcp;
 
@@ -17,14 +15,14 @@ public:
     }
 
 private:
-    void do_read(std::string json = "") {
+    void do_read(const std::string &json = "") {
         socket_.async_read_some(boost::asio::buffer(data_, max_length),
-                                [this, self = shared_from_this(), &json](boost::system::error_code ec,
-                                                                         std::size_t length) {
+                                [this, self = shared_from_this(), json](boost::system::error_code ec,
+                                                                        std::size_t length) {
                                     if (!ec) {
-                                        do_read(std::move(json + std::string(data_, length)));
+                                        do_read(json + std::string(data_, length));
                                     } else {
-                                        groupby(json);
+                                        process(json);
                                         socket_.close();
                                     }
                                 });
@@ -67,23 +65,4 @@ private:
     tcp::socket socket_;
 };
 
-int main() {
-    try {
-        boost::asio::io_context io_service;
-
-        using namespace std; // For atoi.
-        server s(io_service, 8001);
-
-        io_service.run();
-    }
-    catch (std::exception &e) {
-        std::cerr << "Exception: " << e.what() << "\n";
-    }
-
-//    //TODO: Group by key_out
-//
-//    //TODO: Run reduce on data
-//
-//    //TODO: Send result somewhere
-//    std::cout << to_csv(key_value_outs);
-}
+#endif //MAP_REDUCE_REDUCE_SERVER_H

@@ -8,7 +8,11 @@ class KeyValueType {
 public:
     virtual void parse(const std::string &) = 0;
 
-    virtual std::string to_string() = 0;
+    virtual std::string to_string() const = 0;
+
+    bool operator<(const KeyValueType &lhs) {
+        return this->to_string() < lhs.to_string();
+    }
 };
 
 //TODO: add SFINAE to instantiate only with pod types
@@ -23,7 +27,7 @@ public:
         std::stringstream(str) >> value;
     }
 
-    std::string to_string() override {
+    std::string to_string() const override {
         return std::to_string(value);
     }
 
