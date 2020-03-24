@@ -4,6 +4,7 @@
 #endif //MAP_REDUCE_UTIL_H
 
 #include <filesystem>
+#include <dlfcn.h>
 
 std::shared_ptr<void> get_config_dll_handler(const std::filesystem::path &path) {
     void *library_handler = dlopen("libmap_reduce_config.so", RTLD_LAZY);
