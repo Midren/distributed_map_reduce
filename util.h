@@ -4,6 +4,8 @@
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "types/KeyValueType.h"
 #include "types/KeyValueTypeFactory.h"
@@ -41,5 +43,24 @@ to_csv(const std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_pt
     return data.str();
 }
 
+std::string to_json(const std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>> &key_value) {
+    boost::property_tree::ptree pt{};
+    const auto &[key, value] = key_value;
+    pt.put("key", key->to_string());
+    pt.put("value", value->to_string());
+
+    std::stringstream ss{};
+    boost::property_tree::json_parser::write_json(ss, pt);
+    return ss.str();
+}
+
+std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
+                        std::unique_ptr<KeyValueTypeFactory> &value_factory) {
+    boost::property_tree::ptree pt{};
+    boost::property_tree::json_parser::read_json(dynamic_cast<std::stringstream &>(std::stringstream{} << data), pt);
+    return make_pair(key_factory->create(pt.get("key", "")),
+                     value_factory->create(pt.get("value", "")));
+}
 
 #endif //MAP_REDUCE_UTIL_H

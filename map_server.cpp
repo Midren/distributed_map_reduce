@@ -1,12 +1,11 @@
-#include <iostream>
 #include <fstream>
 #include <filesystem>
 
 #include "util.h"
-#include "types/KeyValueType.h"
 #include "configurator/JobConfig.h"
-#include "configurator/util.h"
+#include "configurator/config.h"
 
+#include <boost/asio.hpp>
 
 std::string read_data(const std::filesystem::path &) {
     std::ifstream fin{"input.csv"};
@@ -17,6 +16,9 @@ std::string read_data(const std::filesystem::path &) {
 }
 
 int main() {
+    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("127.0.0.1"), 8001);
+    boost::asio::io_service service;
+
     auto library_handler = get_config_dll_handler("libmap_reduce_config.so");
     auto cfg = get_config(library_handler);
 
@@ -24,14 +26,12 @@ int main() {
 
     auto key_value_ins = get_key_values_from_csv(data, cfg->key_in_factory, cfg->value_in_factory);
 
-    std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> key_value_outs;
-
-    std::transform(key_value_ins.begin(), key_value_ins.end(), std::back_inserter(key_value_outs),
-                   [&cfg](const auto &key_value) {
-                       const auto &[key, value] = key_value;
-                       return cfg->map_class->map(key, value);
-                   });
-
-    std::cout << to_csv(key_value_outs);
-    //TODO: Add sending to reduce node
+    std::for_each(key_value_ins.begin(), key_value_ins.end(),
+                  [&cfg, &ep, &service](const auto &key_value) {
+                      boost::asio::ip::tcp::socket sock(service);
+                      sock.connect(ep);
+                      const auto &[key, value] = key_value;;
+                      sock.write_some(boost::asio::buffer(to_json(cfg->map_class->map(key, value))));
+                      sock.close();
+                  });
 }
