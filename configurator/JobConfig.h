@@ -22,7 +22,7 @@ public:
               map_class(std::move(map_class)),
               reduce_class(std::move(reduce_class)),
               key_in_factory(std::move(key_in_factory)),
-              key_out_factory(std::move(key_in_factory)),
+              key_out_factory(std::move(key_out_factory)),
               value_in_factory(std::move(value_in_factory)),
               value_out_factory(std::move(value_out_factory)),
               value_res_factory(std::move(value_res_factory)) {};
