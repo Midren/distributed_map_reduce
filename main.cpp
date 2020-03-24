@@ -1,40 +1,23 @@
 #include <iostream>
-#include <numeric>
-#include <algorithm>
-#include <functional>
+#include <boost/asio/io_context.hpp>
 
-#include "dlfcn.h"
-#include "configurator/JobConfig.h"
+#include "json_server.h"
+#include "util.h"
+#include "configurator/config.h"
 
 int main() {
-    auto library_handler = dlopen("libmap_reduce_config.so", RTLD_LAZY);
 
-    if (library_handler == nullptr) {
-        std::cerr << dlerror() << std::endl;
-        return 1;
-    }
+    boost::asio::io_context io_service;
 
-    auto get_cfg = (get_config_t) dlsym(library_handler, "get_config");
-    auto cfg = get_cfg();
-
-    std::vector<int> real_inputs(4);
-    std::iota(real_inputs.begin(), real_inputs.end(), 0);
-    std::vector<std::unique_ptr<KeyValueType>> keys, inputs;
-    std::transform(real_inputs.begin(), real_inputs.end(), std::back_inserter(keys), [](const auto &x) {
-        return std::make_unique<IntKeyValueType>(0);
-    });
-    std::transform(real_inputs.begin(), real_inputs.end(), std::back_inserter(inputs), [](const auto &x) {
-        return std::make_unique<IntKeyValueType>(x);
+    JsonServer s(io_service, 8002, [&io_service](std::string json) {
+        auto library_handler = get_config_dll_handler("libmap_reduce_config.so");
+        auto cfg = get_config(library_handler);
+        auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory, cfg->value_res_factory);
+        std::cout << "The result of Map/Reduce is " << value->to_string() << std::endl;
+        io_service.stop();
     });
 
-    std::vector<std::unique_ptr<KeyValueType>> outputs;
-    std::transform(keys.begin(), keys.end(), inputs.begin(), std::back_inserter(outputs),
-                   [&](const auto &key, const auto &value) {
-                       return cfg->map_class->map(key, value).second;
-                   });
-
-    std::cout << dynamic_cast<IntKeyValueType *>(cfg->reduce_class->reduce(keys[0], outputs).second.get())->value;
-    dlclose(library_handler);
+    io_service.run();
 
     return 0;
 }

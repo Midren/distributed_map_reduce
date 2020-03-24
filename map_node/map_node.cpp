@@ -28,10 +28,13 @@ int main() {
 
     std::for_each(key_value_ins.begin(), key_value_ins.end(),
                   [&cfg, &ep, &service](const auto &key_value) {
-                      boost::asio::ip::tcp::socket sock(service);
-                      sock.connect(ep);
                       const auto &[key, value] = key_value;;
-                      sock.write_some(boost::asio::buffer(to_json(cfg->map_class->map(key, value))));
+                      auto res = cfg->map_class->map(key, value);
+
+                      boost::asio::ip::tcp::socket sock(service);
+                      //TODO: checking if no server
+                      sock.connect(ep);
+                      sock.write_some(boost::asio::buffer(to_json(res)));
                       sock.close();
                   });
 }

@@ -10,9 +10,6 @@ int main() {
 
     io_service.run();
 
-//    //TODO: Run reduce on data
-//
 //    //TODO: Send result somewhere
-//    std::cout << to_csv(key_value_outs);
 }
 
