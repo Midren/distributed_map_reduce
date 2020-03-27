@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include <numeric>
 #include "JobConfig.h"
 
@@ -29,11 +32,11 @@ JobConfig *get_config() {
 }
 
 JobConfig job_config = JobConfig("sum of squares",
-                                 std::make_unique<SquareMap>(),
-                                 std::make_unique<SumReduce>(),
-                                 std::make_unique<IntKeyValueTypeFactory>(),
-                                 std::make_unique<IntKeyValueTypeFactory>(),
-                                 std::make_unique<IntKeyValueTypeFactory>(),
-                                 std::make_unique<IntKeyValueTypeFactory>(),
-                                 std::make_unique<IntKeyValueTypeFactory>()
+                                 std::move(std::make_unique<SquareMap>()),
+                                 std::move(std::make_unique<SumReduce>()),
+                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                 std::move(std::make_unique<IntKeyValueTypeFactory>())
 );

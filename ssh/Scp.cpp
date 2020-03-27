@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Scp.h"
 
 Scp::Scp(ssh::Session &session, int mode, std::string location) {
@@ -16,13 +19,13 @@ Scp::~Scp() {
     ssh_scp_free(scp);
 }
 
-void Scp::push_file(std::string filename, size_t text_size, int perms) {
+void Scp::push_file(const std::string &filename, size_t text_size, int perms) {
     if (ssh_scp_push_file(scp, filename.c_str(), text_size, perms) != SSH_OK) {
         throw std::runtime_error("Cannot open remote file");
     }
 }
 
-void Scp::write(std::string text) {
+void Scp::write(const std::string &text) {
     if (ssh_scp_write(scp, text.c_str(), text.length()) != SSH_OK) {
         throw std::runtime_error("Cannot write to remote file");
     }
@@ -40,10 +43,10 @@ std::string Scp::read() {
     size_t size = ssh_scp_request_get_size(scp);
     char *buffer = new char[size];
     if (ssh_scp_read(scp, buffer, size) == SSH_ERROR) {
-        free(buffer);
+        delete[] buffer;
         throw std::runtime_error("Error receiving file data");
     }
     std::string ret(buffer, size);
-    free(buffer);
+    delete[] buffer;
     return ret;
 }

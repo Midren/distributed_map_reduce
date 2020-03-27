@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(map_reduce)
+project(map_reduce CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -23,3 +23,27 @@ target_link_libraries(reduce_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_SYSTEM_LIBRA
 target_link_libraries(map_reduce -lssh stdc++fs -ldl)
 target_link_libraries(map_node -lssh stdc++fs -ldl)
 target_link_libraries(reduce_node -lssh stdc++fs -ldl)
+
+if (UNIX AND NOT APPLE AND NOT CYGWIN)
+    include(${PROJECT_SOURCE_DIR}/PVS-Studio.cmake)
+    pvs_studio_add_target(TARGET map_reduce.analyze ALL
+            OUTPUT FORMAT errorfile
+            ANALYZE map_reduce
+            MODE GA:1,2 OP
+            LOG target1.err)
+    #    pvs_studio_add_target(TARGET reduce_node.analyze ALL
+    #            OUTPUT FORMAT errorfile
+    #            ANALYZE reduce_node
+    #            MODE GA:1,2 OP
+    #            LOG target2.err)
+    #    pvs_studio_add_target(TARGET map_node.analyze ALL
+    #            OUTPUT FORMAT errorfile
+    #            ANALYZE map_node
+    #            MODE GA:1,2 OP
+    #            LOG target.err)
+    #    pvs_studio_add_target(TARGET map_reduce_config.analyze ALL
+    #            OUTPUT FORMAT errorfile
+    #            ANALYZE map_reduce_config
+    #            MODE GA:1,2 OP
+    #            LOG target1.err)
+endif ()

@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #ifndef MAP_REDUCE_REDUCE_H
 #define MAP_REDUCE_REDUCE_H
 
@@ -9,15 +12,15 @@
 #include "../configurator/config.h"
 #include "../util.h"
 
-template<typename T>
 struct ptr_less {
-    bool operator()(const T &lhs, const T &rhs) const {
-        return *lhs.get() < *(rhs).get();
+    template<typename T>
+    bool operator()(const std::unique_ptr<T> &lhs, const std::unique_ptr<T> &rhs) const {
+        return *lhs < *rhs;
     }
 };
 
 //TODO: add hash method for KeyValueType and replace to TBD concurrent_hashmap instead of map + mutex
-std::map<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>, ptr_less<std::unique_ptr<KeyValueType>>> key_values;
+std::map<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>, ptr_less> key_values;
 std::mutex map_mutex;
 
 ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>> queue;

@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #ifndef MAP_REDUCE_JOBCONFIG_H
 #define MAP_REDUCE_JOBCONFIG_H
 
@@ -10,13 +13,13 @@
 class JobConfig {
 public:
     JobConfig(std::string job_name,
-              std::unique_ptr<MapBase> &&map_class,
-              std::unique_ptr<ReduceBase> &&reduce_class,
-              std::unique_ptr<KeyValueTypeFactory> &&key_in_factory,
-              std::unique_ptr<KeyValueTypeFactory> &&key_out_factory,
-              std::unique_ptr<KeyValueTypeFactory> &&value_in_factory,
-              std::unique_ptr<KeyValueTypeFactory> &&value_out_factory,
-              std::unique_ptr<KeyValueTypeFactory> &&value_res_factory
+              std::unique_ptr<MapBase> map_class,
+              std::unique_ptr<ReduceBase> reduce_class,
+              std::unique_ptr<KeyValueTypeFactory> key_in_factory,
+              std::unique_ptr<KeyValueTypeFactory> key_out_factory,
+              std::unique_ptr<KeyValueTypeFactory> value_in_factory,
+              std::unique_ptr<KeyValueTypeFactory> value_out_factory,
+              std::unique_ptr<KeyValueTypeFactory> value_res_factory
     )
             : job_name(std::move(job_name)),
               map_class(std::move(map_class)),

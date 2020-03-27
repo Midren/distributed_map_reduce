@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #ifndef CONCURRENT_MAKE_NODE_H
 #define CONCURRENT_MAKE_NODE_H
 
@@ -18,9 +21,9 @@ public:
 
     void connect();
 
-    std::string execute_command(std::string cmd, bool is_output);
+    std::string execute_command(const std::string &cmd, bool is_output);
 
-    void scp_write_file(std::filesystem::path path_to_file, std::string text);
+    void scp_write_file(std::filesystem::path path_to_file, const std::string &text);
 
     std::string scp_read_file(std::filesystem::path path_to_file);
 
