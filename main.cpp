@@ -46,7 +46,7 @@ get_result(const std::shared_ptr<JobConfig> &cfg) {
 }
 
 std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
-get_result_blocking(const std::shared_ptr<JobConfig> cfg) {
+get_result_blocking(const std::shared_ptr<JobConfig> &cfg) {
     auto future = get_result(cfg);
     future.wait();
     return future.get();

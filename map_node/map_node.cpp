@@ -50,15 +50,6 @@ std::string read_data(const std::filesystem::path &) {
     return dynamic_cast<std::stringstream &>(std::stringstream{} << fin.rdbuf()).str();
 }
 
-std::pair<std::string, int> parse_ip_port(const std::string &address) {
-    std::vector<std::string> ip_port;
-    boost::split(ip_port, address, boost::is_any_of(":"));
-    if (ip_port.size() != 2) {
-        throw std::runtime_error("Address should have format ip:port");
-    }
-    return {ip_port[0], std::stoi(ip_port[1])};
-}
-
 int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto input_file = vm["input_file"].as<std::filesystem::path>();

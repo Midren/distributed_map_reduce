@@ -26,21 +26,21 @@ target_link_libraries(reduce_node -lssh stdc++fs -ldl)
 
 if (UNIX AND NOT APPLE AND NOT CYGWIN)
     include(${PROJECT_SOURCE_DIR}/PVS-Studio.cmake)
-    pvs_studio_add_target(TARGET map_reduce.analyze ALL
-            OUTPUT FORMAT errorfile
-            ANALYZE map_reduce
-            MODE GA:1,2 OP
-            LOG target1.err)
-    #    pvs_studio_add_target(TARGET reduce_node.analyze ALL
-    #            OUTPUT FORMAT errorfile
-    #            ANALYZE reduce_node
-    #            MODE GA:1,2 OP
-    #            LOG target2.err)
-    #    pvs_studio_add_target(TARGET map_node.analyze ALL
-    #            OUTPUT FORMAT errorfile
-    #            ANALYZE map_node
-    #            MODE GA:1,2 OP
-    #            LOG target.err)
+#    pvs_studio_add_target(TARGET map_reduce.analyze ALL
+#            OUTPUT FORMAT errorfile
+#            ANALYZE map_reduce
+#            MODE GA:1,2 OP
+#            LOG target1.err)
+        pvs_studio_add_target(TARGET reduce_node.analyze ALL
+                OUTPUT FORMAT errorfile
+                ANALYZE reduce_node
+                MODE GA:1,2 OP
+                LOG target2.err)
+#        pvs_studio_add_target(TARGET map_node.analyze ALL
+#                OUTPUT FORMAT errorfile
+#                ANALYZE map_node
+#                MODE GA:1,2 OP
+#                LOG target.err)
     #    pvs_studio_add_target(TARGET map_reduce_config.analyze ALL
     #            OUTPUT FORMAT errorfile
     #            ANALYZE map_reduce_config

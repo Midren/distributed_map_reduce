@@ -13,6 +13,16 @@
 #include "types/KeyValueType.h"
 #include "types/KeyValueTypeFactory.h"
 
+
+std::pair<std::string, unsigned int> parse_ip_port(const std::string &address) {
+    std::vector<std::string> ip_port;
+    boost::split(ip_port, address, boost::is_any_of(":"));
+    if (ip_port.size() != 2) {
+        throw std::runtime_error("Address should have format ip:port");
+    }
+    return {ip_port[0], std::stoi(ip_port[1])};
+}
+
 std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
 get_key_values_from_csv(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
                         std::unique_ptr<KeyValueTypeFactory> &value_factory, char delimiter = ',',
