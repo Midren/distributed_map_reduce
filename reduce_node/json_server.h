@@ -27,7 +27,7 @@ private:
                                         do_read(json + std::string(buf.data(), length));
                                     } else {
                                         json_handler(json);
-//                                        socket_.close();
+                                        socket_.close();
                                     }
                                 });
     }

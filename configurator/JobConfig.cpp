@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include <numeric>
+#include <memory>
 #include "JobConfig.h"
 
 class SquareMap : public MapBase {
@@ -27,16 +28,14 @@ public:
     }
 };
 
-JobConfig *get_config() {
-    return &job_config;
+std::shared_ptr<JobConfig> get_config() {
+    return std::make_shared<JobConfig>("sum of squares",
+                                       std::move(std::make_unique<SquareMap>()),
+                                       std::move(std::make_unique<SumReduce>()),
+                                       std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                       std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                       std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                       std::move(std::make_unique<IntKeyValueTypeFactory>()),
+                                       std::move(std::make_unique<IntKeyValueTypeFactory>())
+    );
 }
-
-JobConfig job_config = JobConfig("sum of squares",
-                                 std::move(std::make_unique<SquareMap>()),
-                                 std::move(std::make_unique<SumReduce>()),
-                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
-                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
-                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
-                                 std::move(std::make_unique<IntKeyValueTypeFactory>()),
-                                 std::move(std::make_unique<IntKeyValueTypeFactory>())
-);

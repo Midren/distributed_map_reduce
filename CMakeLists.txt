@@ -14,7 +14,7 @@ add_library(map_reduce_config SHARED configurator/JobConfig.cpp)
 
 add_executable(map_reduce main.cpp ssh/Scp.cpp ssh/Node.cpp types/KeyValueTypeFactory.cpp)
 add_executable(map_node map_node/map_node.cpp types/KeyValueTypeFactory.cpp)
-add_executable(reduce_node json_server.h types/KeyValueTypeFactory.cpp reduce_node/reduce_node.cpp)
+add_executable(reduce_node reduce_node/json_server.h types/KeyValueTypeFactory.cpp reduce_node/reduce_node.cpp)
 
 target_link_libraries(map_reduce ${CMAKE_THREAD_LIBS_INIT} ${Boost_SYSTEM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARIES})
 target_link_libraries(map_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_SYSTEM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARIES})

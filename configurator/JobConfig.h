@@ -5,6 +5,7 @@
 #define MAP_REDUCE_JOBCONFIG_H
 
 #include <utility>
+#include <memory>
 
 #include "ReduceBase.h"
 #include "MapBase.h"
@@ -44,9 +45,9 @@ extern JobConfig job_config;
 
 extern "C"
 {
-typedef JobConfig *(*get_config_t)();
+typedef std::shared_ptr<JobConfig> (*get_config_t)();
 
-JobConfig *get_config();
+std::shared_ptr<JobConfig> get_config();
 }
 
 #endif //MAP_REDUCE_JOBCONFIG_H

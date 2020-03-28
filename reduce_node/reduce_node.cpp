@@ -3,7 +3,7 @@
 
 #include <boost/asio.hpp>
 
-#include "../json_server.h"
+#include "json_server.h"
 #include "reduce.h"
 
 int main() {

@@ -62,8 +62,8 @@ get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFac
                         std::unique_ptr<KeyValueTypeFactory> &value_factory) {
     boost::property_tree::ptree pt{};
     boost::property_tree::json_parser::read_json(dynamic_cast<std::stringstream &>(std::stringstream{} << data), pt);
-    return {std::move(key_factory->create(pt.get("key", ""))),
-            std::move(value_factory->create(pt.get("value", "")))};
+    return {key_factory->create(pt.get("key", "")),
+            value_factory->create(pt.get("value", ""))};
 }
 
 #endif //MAP_REDUCE_UTIL_H

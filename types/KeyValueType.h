@@ -16,6 +16,8 @@ public:
     bool operator<(const KeyValueType &lhs) {
         return this->to_string() < lhs.to_string();
     }
+
+    virtual ~KeyValueType() = default;
 };
 
 //TODO: add SFINAE to instantiate only with pod types
