@@ -10,7 +10,7 @@
 #include "JobConfig.h"
 
 std::shared_ptr<void> get_config_dll_handler(const std::filesystem::path &path) {
-    void *library_handler = dlopen("libmap_reduce_config.so", RTLD_LAZY);
+    void *library_handler = dlopen(path.c_str(), RTLD_LAZY);
     if (library_handler == nullptr) {
         throw std::runtime_error(dlerror());
     }

@@ -2,12 +2,16 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include <iostream>
+#include <filesystem>
 
 #include <boost/asio.hpp>
 #include <boost/asio/use_future.hpp>
 
 #include "util.h"
 #include "configurator/config.h"
+#include "ssh/Node.h"
+
+namespace fs = std::filesystem;
 
 std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
 get_result(const std::shared_ptr<JobConfig> &cfg) {
@@ -52,11 +56,52 @@ get_result_blocking(const std::shared_ptr<JobConfig> &cfg) {
     return future.get();
 }
 
+void prepare_node(Node &n) {
+    n.connect();
+    n.execute_command("mkdir ~/.cache/mapreduce", false);
+}
+
 int main() {
-    auto library_handler = get_config_dll_handler("libmap_reduce_config.so");
+    auto[master_ip, master_port] = parse_ip_port("127.0.0.1:8002");
+    auto[reduce_ip, reduce_port] = parse_ip_port("127.0.0.1:8001");
+    auto map_ip = "127.0.0.1";
+    fs::path dll_path("/home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/libmap_reduce_config.so");
+
+    auto library_handler = get_config_dll_handler(dll_path.filename());
     auto cfg = get_config(library_handler);
 
-    auto[key, value] = get_result_blocking(cfg);
+    auto future = get_result(cfg);
+
+    try {
+        ssh_init();
+        std::cout << map_ip << " " << reduce_ip << std::endl;
+        Node map_node(map_ip), reduce_node(reduce_ip);
+        reduce_node.connect();
+        reduce_node.scp_send_file(dll_path, fs::path("/home/midren/.cache/mapreduce/libreduce_config.so"));
+        reduce_node.execute_command("chmod +x ~/.cache/mapreduce/libreduce_config.so", false);
+        reduce_node.execute_command(
+                "cd ~/.cache/mapreduce && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/midren/.cache/mapreduce/ &&"
+                "nohup /home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/reduce_node --input_num 4 --master_node_address 127.0.0.1:8002 --port 8001 --config_file libreduce_config.so > reduce.out 2> reduce.err < /dev/null &",
+                false);
+        map_node.connect();
+        map_node.scp_send_file(
+                fs::path(
+                        "/home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/libmap_reduce_config.so"),
+                fs::path("/home/midren/.cache/mapreduce/libmap_config.so"));
+        map_node.execute_command("chmod +x ~/.cache/mapreduce/libmap_config.so", false);
+        map_node.execute_command(
+                "cd ~/.cache/mapreduce && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/midren/.cache/mapreduce/ &&"
+                "/home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/map_node --input_file input.csv --reduce_node_address 127.0.0.1:8001 --config_file libmap_config.so > map.out 2> map.err < /dev/null",
+                false);
+        ssh_finalize();
+    } catch (ssh::SshException &e) {
+        std::cerr << e.getError() << std::endl;
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    future.wait();
+    auto[key, value] = future.get();
 
     std::cout << "The result of Map/Reduce is " << value->to_string() << std::endl;
 
