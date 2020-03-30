@@ -53,6 +53,8 @@ process(const std::string &json, int map_cnt, const std::shared_ptr<JobConfig> &
             auto values = std::vector<std::unique_ptr<KeyValueType>>{};
             values.push_back(std::move(value));
             queue.push(make_pair(std::move(key), std::move(values)));
+            //TODO: make actually concurrent
+            reduce(queue, cfg);
         } else {
             key_values[std::move(key)].push_back(std::move(value));
         }

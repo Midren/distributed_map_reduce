@@ -13,7 +13,7 @@
 
 class Node {
 public:
-    explicit Node(std::string node_name);
+    explicit Node(const std::string& node_name);
 
     Node(const Node &node);
 
@@ -23,13 +23,13 @@ public:
 
     std::string execute_command(const std::string &cmd, bool is_output);
 
-    void scp_write_file(std::filesystem::path path_to_file, const std::string &text);
+    void scp_write_file(const std::filesystem::path& path_to_file, const std::string &text);
 
-    std::string scp_read_file(std::filesystem::path path_to_file);
+    std::string scp_read_file(const std::filesystem::path& path_to_file);
 
-    void scp_send_file(std::filesystem::path from, std::filesystem::path to);
+    void scp_send_file(const std::filesystem::path& from, const std::filesystem::path& to);
 
-    void scp_download_file(std::filesystem::path from, std::filesystem::path to);
+    void scp_download_file(const std::filesystem::path& from, const std::filesystem::path& to);
 
 
 private:

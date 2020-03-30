@@ -48,7 +48,7 @@ get_result(const std::shared_ptr<JobConfig> &cfg) {
     return future;
 }
 
-void send_config(Node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string config_name) {
+void send_config(Node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string &config_name) {
     n.execute_command("mkdir " + ("~" / base_directory).string() + "2> /dev/null", false);
     n.scp_send_file(dll_path, base_directory / config_name);
     n.execute_command("chmod +x " + ("~" / base_directory / config_name).string(), false);
