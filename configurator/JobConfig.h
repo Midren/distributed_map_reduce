@@ -1,8 +1,8 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#ifndef MAP_REDUCE_JOBCONFIG_H
-#define MAP_REDUCE_JOBCONFIG_H
+#ifndef MAP_REDUCE_JOB_CONFIG_H
+#define MAP_REDUCE_JOB_CONFIG_H
 
 #include <utility>
 #include <memory>
@@ -50,4 +50,4 @@ typedef std::shared_ptr<JobConfig> (*get_config_t)();
 std::shared_ptr<JobConfig> get_config();
 }
 
-#endif //MAP_REDUCE_JOBCONFIG_H
+#endif //MAP_REDUCE_JOB_CONFIG_H

@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "mapreduce.h"
+#include "../map_reduce.h"
 
 int main() {
     std::vector<std::string> map_ips = {"127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"};

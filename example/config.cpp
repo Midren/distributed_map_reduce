@@ -3,7 +3,7 @@
 
 #include <numeric>
 #include <memory>
-#include "JobConfig.h"
+#include "../configurator/JobConfig.h"
 
 class SquareMap : public MapBase {
 public:

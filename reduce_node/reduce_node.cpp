@@ -15,7 +15,7 @@ po::variables_map parse_args(int argc, char **argv) {
     allowed.add_options()
             ("help,h", "Show help")
             ("config_file,c", po::value<std::filesystem::path>()->default_value("libmap_reduce_config.so"),
-             "Path to config dll for map/reduce")
+             "Path to JobConfig dll for map/reduce")
             ("port,p", po::value<unsigned int>()->required(), "Port, on which server will be running")
             ("master_node_address,O", po::value<std::string>()->required(), "Address of master node")
             ("input_num,n", po::value<unsigned int>()->required(), "Number of inputs per key");

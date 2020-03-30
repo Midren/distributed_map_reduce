@@ -1,20 +1,17 @@
-#ifndef MAP_REDUCE_MAPREDUCE_H
-#define MAP_REDUCE_MAPREDUCE_H
+#include "map_reduce.h"
 
-#include <filesystem>
-
+#include <iostream>
 #include <boost/asio.hpp>
 #include <boost/asio/use_future.hpp>
 
+#include "ssh/Node.h"
 #include "util.h"
 #include "configurator/config.h"
-#include "ssh/Node.h"
 
-namespace fs = std::filesystem;
 
 static std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
 get_result(const std::shared_ptr<JobConfig> &cfg) {
-    std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> promise;
+    std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType >>> promise;
     auto future = promise.get_future();
 
     std::thread([](std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> promise,
@@ -48,7 +45,8 @@ get_result(const std::shared_ptr<JobConfig> &cfg) {
     return future;
 }
 
-void send_config(Node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string &config_name) {
+static void
+send_config(Node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string &config_name) {
     n.execute_command("mkdir " + ("~" / base_directory).string() + "2> /dev/null", false);
     n.scp_send_file(dll_path, base_directory / config_name);
     n.execute_command("chmod +x " + ("~" / base_directory / config_name).string(), false);
@@ -117,6 +115,7 @@ run_task(const std::vector<std::string> &map_ips, const std::string &reduce_addr
     return future;
 }
 
+
 std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
 run_task_blocking(const std::vector<std::string> &map_ips, const std::string &reduce_address,
                   const std::string &master_address,
@@ -125,5 +124,3 @@ run_task_blocking(const std::vector<std::string> &map_ips, const std::string &re
     future.wait();
     return future.get();
 }
-
-#endif //MAP_REDUCE_MAPREDUCE_H
