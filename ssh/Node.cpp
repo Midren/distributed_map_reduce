@@ -9,7 +9,7 @@ Node::Node(const Node &node) : session(ssh::Session{}), is_connected(false) {
 }
 
 Node::Node(const std::string &node_name) : session(ssh::Session{}), is_connected(false) {
-    int verbosity = SSH_LOG_NOLOG;
+    int verbosity = SSH_LOG_NONE;
     session.setOption(SSH_OPTIONS_HOST, node_name.c_str());
     session.setOption(SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
     session.setOption(SSH_OPTIONS_USER, "mapreduce");
@@ -27,8 +27,6 @@ void Node::connect() {
     if (session.isServerKnown() != SSH_SERVER_KNOWN_OK) {
         if (session.writeKnownhost() != SSH_OK) {
             throw std::runtime_error("writeKnownHost failed");
-        } else {
-            session.connect();
         }
     }
     if (session.userauthPublickeyAuto() != SSH_AUTH_SUCCESS) {
