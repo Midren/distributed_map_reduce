@@ -31,6 +31,10 @@ get_key_values_from_csv(const std::string &data, std::unique_ptr<KeyValueTypeFac
     boost::split(key_values, data, [end_of_line](auto x) {
         return x == end_of_line;
     });
+    //Remove blank lines or ill-formed lines
+    key_values.erase(std::remove_if(key_values.begin(), key_values.end(), [delimiter](const std::string &val) {
+        return val.find(delimiter) == std::string::npos;
+    }));
 
     std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> key_value_ins;
     std::transform(key_values.begin() + 1, key_values.end(), std::back_inserter(key_value_ins),

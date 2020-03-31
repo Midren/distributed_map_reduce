@@ -42,8 +42,8 @@ po::variables_map parse_args(int argc, char **argv) {
     return vm;
 }
 
-std::string read_data(const std::filesystem::path &) {
-    std::ifstream fin{"input.csv"};
+std::string read_data(const std::filesystem::path &file) {
+    std::ifstream fin{file};
     if (!fin.is_open()) {
         throw std::runtime_error("Cannot open input file");
     }

@@ -33,14 +33,14 @@ reduce(ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std:
 
     boost::asio::io_service service;
     //TODO: remove hardcoded constants
-    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("127.0.0.1"), 8002);
+    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("172.17.0.7"), 8002);
     boost::asio::ip::tcp::socket sock(service);
     try {
         sock.connect(ep);
         sock.write_some(boost::asio::buffer(to_json(res)));
         sock.close();
     } catch (std::exception &e) {
-        throw std::runtime_error("Couldn't send data to reduce node: " + std::string(e.what()));
+        throw std::runtime_error("Couldn't send data to master node: " + std::string(e.what()));
     }
 }
 
