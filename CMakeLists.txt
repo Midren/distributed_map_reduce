@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 project(map_reduce CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -11,7 +11,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${LIBSSH_INCLUDE_DIRS})
 
 add_library(map_reduce STATIC map_reduce.cpp configurator/config.cpp types/KeyValueTypeFactory.cpp ssh/Node.cpp ssh/Scp.cpp)
-target_link_libraries(map_reduce ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} stdc++fs -ldl -lssh)
+target_link_libraries(map_reduce PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} stdc++fs -ldl -lssh)
 
 add_executable(map_node map_node/map_node.cpp types/KeyValueTypeFactory.cpp)
 target_link_libraries(map_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} map_reduce)
