@@ -30,10 +30,14 @@ EXPOSE 8001
 # For master node
 EXPOSE 8002
 
-RUN useradd -m mapreduce && \
+RUN echo "export PATH=$PATH:/home/mapreduce/distributed_map_reduce/bin" >> /etc/environment
+
+RUN useradd -m mapreduce --create-home && \
     echo 'mapreduce:mapreduce' | chpasswd && \
+    adduser mapreduce sudo && \
     chown -R mapreduce /home/mapreduce
 
+USER mapreduce
 WORKDIR /home/mapreduce
 RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distributed_map_reduce && \
     cd distributed_map_reduce && \
@@ -43,9 +47,7 @@ RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distribute
     make && \
     make install
 
-RUN echo "export PATH=$PATH:/home/mapreduce/distributed_map_reduce/bin" >> /etc/environment
-RUN chmod 777 distributed_map_reduce/bin/*
 
-ENTRYPOINT service ssh restart && \
+ENTRYPOINT echo "mapreduce" | sudo -S service ssh restart && \
            export PATH=$PATH:/home/mapreduce/distributed_map_reduce/build/ && \
            bash
