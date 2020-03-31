@@ -4,12 +4,11 @@
 #include <iostream>
 #include "Node.h"
 
-Node::Node(const Node &node) {
+Node::Node(const Node &node) : session(ssh::Session{}), is_connected(false) {
     this->session.optionsCopy(node.session);
-    this->is_connected = node.is_connected;
 }
 
-Node::Node(const std::string &node_name) : session(), is_connected(false) {
+Node::Node(const std::string &node_name) : session(ssh::Session{}), is_connected(false) {
     int verbosity = SSH_LOG_NOLOG;
     session.setOption(SSH_OPTIONS_HOST, node_name.c_str());
     session.setOption(SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
