@@ -81,9 +81,11 @@ void Node::scp_send_file(const std::filesystem::path &from, const std::filesyste
     std::ifstream input(from, std::ifstream::binary);
     if (input.is_open()) {
         std::string data = dynamic_cast<std::ostringstream &>(std::ostringstream{} << input.rdbuf()).str();
-        Node::scp_write_file(to, data);
+        input.close();
+        scp_write_file(to, data);
+    } else {
+        throw std::runtime_error("Cannot find a file");
     }
-    input.close();
 };
 
 void Node::scp_download_file(const std::filesystem::path &from, const std::filesystem::path &to) {

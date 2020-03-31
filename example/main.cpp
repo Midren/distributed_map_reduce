@@ -15,8 +15,9 @@ int main() {
     const std::string reduce_address = "172.17.0.6:8001";
     const std::string master_address = "172.17.0.7:8002";
 
-    fs::path map_input_file = "~/distributed_map_reduce/example/input.csv";
-    fs::path dll_path("~/distributed_map_reduce/example/build/libmap_reduce_config.so");
+    fs::path home_dir(getenv("HOME"));
+    fs::path map_input_file = home_dir / "distributed_map_reduce/example/input.csv";
+    fs::path dll_path = home_dir / "distributed_map_reduce/example/build/libmap_reduce_config.so";
 
     auto[key, value] = run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
 

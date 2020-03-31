@@ -21,7 +21,7 @@ Scp::~Scp() {
 
 void Scp::push_file(const std::string &filename, size_t text_size, int perms) {
     if (ssh_scp_push_file(scp, filename.c_str(), text_size, perms) != SSH_OK) {
-        throw std::runtime_error("Cannot open remote file");
+        throw std::runtime_error("Cannot create remote file");
     }
 }
 
