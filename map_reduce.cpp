@@ -57,8 +57,7 @@ run_reduce_node(const std::string &reduce_address, const std::string &master_add
                 const fs::path &base_directory, const fs::path &dll_path) {
     auto[reduce_ip, reduce_port] = parse_ip_port(reduce_address);
     auto[master_ip, master_port] = parse_ip_port(master_address);
-    const fs::path reduce_node_path(
-            "/home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/reduce_node");
+    const fs::path reduce_node_path("reduce_node");
     Node reduce_node(reduce_ip);
 
     reduce_node.connect();
@@ -77,7 +76,7 @@ run_reduce_node(const std::string &reduce_address, const std::string &master_add
 void run_map_nodes(const std::vector<std::string> &map_ips, const std::string &reduce_address,
                    const fs::path &map_input_file, const fs::path &base_directory, const fs::path &dll_path) {
     auto[reduce_ip, reduce_port] = parse_ip_port(reduce_address);
-    const fs::path map_node_path("/home/midren/ucu/distributed_db/DistributedMapReduce/cmake-build-debug/map_node");
+    const fs::path map_node_path("map_node");
     for (auto &map_ip: map_ips) {
         Node map_node(map_ip);
         map_node.connect();

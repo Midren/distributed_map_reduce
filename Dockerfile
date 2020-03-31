@@ -7,6 +7,8 @@ RUN apt-get update -y && \
     libssh-dev \
     libboost-all-dev \
     git \
+    net-tools \
+    iputils-ping \
     make
 
 # For reduce node
@@ -19,7 +21,7 @@ USER mapreduce
 
 WORKDIR /home/mapreduce
 RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distributed_map_reduce && \
-    cd distributed_map_reduce && \
+    cd distributed_map_reduce &&  \
     mkdir build && \
     cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release && \
