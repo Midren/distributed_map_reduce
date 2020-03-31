@@ -15,7 +15,7 @@ int main() {
     const std::string reduce_address = "172.17.0.6:8001";
     const std::string master_address = "172.17.0.7:8002";
 
-    fs::path home_dir("/home/map_reduce");
+    fs::path home_dir(getenv("HOME"));
     fs::path map_input_file = home_dir / "distributed_map_reduce/example/input.csv";
     fs::path dll_path = home_dir / "distributed_map_reduce/example/build/libmap_reduce_config.so";
 
