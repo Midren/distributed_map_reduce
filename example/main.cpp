@@ -8,7 +8,7 @@
 #include "../map_reduce.h"
 
 int main() {
-    std::vector<std::string> map_ips = {"172.17.0.2", "127.0.0.3", "127.0.0.4", "127.0.0.5"};
+    std::vector<std::string> map_ips = {"172.17.0.2", "172.0.0.3", "172.0.0.4", "172.0.0.5"};
     const std::string reduce_address = "172.17.0.6:8001";
     const std::string master_address = "172.17.0.7:8002";
 
