@@ -22,7 +22,7 @@ target_link_libraries(reduce_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} m
 install(TARGETS map_reduce DESTINATION ${CMAKE_SOURCE_DIR}/lib)
 install(TARGETS map_node reduce_node DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 
-if (UNIX AND NOT APPLE AND NOT CYGWIN)
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG" AND UNIX AND NOT APPLE AND NOT CYGWIN)
     include(${PROJECT_SOURCE_DIR}/PVS-Studio.cmake)
     pvs_studio_add_target(TARGET reduce_node.analyze ALL
             OUTPUT FORMAT errorfile
