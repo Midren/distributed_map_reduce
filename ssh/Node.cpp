@@ -27,7 +27,7 @@ void Node::connect() {
     is_connected = true;
     if (session.isServerKnown() != SSH_SERVER_KNOWN_OK) {
         if (session.writeKnownhost() != SSH_OK) {
-            std::cerr << "writeKnownHost failed" << std::endl;
+            throw std::runtime_error("writeKnownHost failed");
         } else {
             session.connect();
         }
