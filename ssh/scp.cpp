@@ -43,7 +43,7 @@ namespace ssh {
 
     std::string scp::read() {
         size_t size = ssh_scp_request_get_size(scp_);
-        auto buffer = std::unique_ptr<char>(new char[size]);
+        auto buffer = std::unique_ptr<char[]>(new char[size]);
 
         if (ssh_scp_read(scp_, buffer.get(), size) == SSH_ERROR)
             throw std::runtime_error("Error receiving file data");
