@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <cmath>
 
 #include "../util.h"
 #include "../configurator/JobConfig.h"
@@ -50,6 +51,29 @@ std::string read_data(const std::filesystem::path &file) {
     return dynamic_cast<std::stringstream &>(std::stringstream{} << fin.rdbuf()).str();
 }
 
+void process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator beg,
+                  std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator end,
+                  const std::shared_ptr<JobConfig> &cfg,
+                  const boost::asio::ip::tcp::endpoint &reduce_ep) {
+    boost::asio::io_service service;
+    std::for_each(beg, end,
+                  [&cfg, &reduce_ep, &service](const auto &key_value) {
+                      const auto &[key, value] = key_value;;
+                      auto res = cfg->map_class->map(key, value);
+
+                      boost::system::error_code ec;
+                      boost::asio::ip::tcp::socket sock(service);
+                      sock.connect(reduce_ep, ec);
+                      sock.non_blocking(false);
+                      if (ec)
+                          throw std::runtime_error("cannot connect to reduce node");
+                      sock.wait(sock.wait_write);
+                      boost::asio::write(sock, boost::asio::buffer(to_json(res)), boost::asio::transfer_all(), ec);
+                      if (ec)
+                          throw std::runtime_error("fail during writing to socket");
+                  });
+}
+
 int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto input_file = vm["input_file"].as<std::filesystem::path>();
@@ -59,31 +83,19 @@ int main(int argc, char **argv) {
     auto library_handler = get_config_dll_handler(dll_file);
     auto cfg = get_config(library_handler);
 
-    boost::asio::io_service service;
-    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip_address), port);
+    boost::asio::ip::tcp::endpoint reduce_ep(boost::asio::ip::address::from_string(ip_address), port);
 
     auto key_value_ins = get_key_values_from_csv(read_data(input_file), cfg->key_in_factory, cfg->value_in_factory);
-    std::for_each(key_value_ins.begin(), key_value_ins.end(),
-                  [&cfg, &ep, &service](const auto &key_value) {
-                      const auto &[key, value] = key_value;;
-                      auto res = cfg->map_class->map(key, value);
 
-                      try {
-                          boost::system::error_code ec;
-                          boost::asio::ip::tcp::socket sock(service);
-                          sock.connect(ep, ec);
-                          sock.non_blocking(false);
-                          if (ec)
-                              throw std::runtime_error("cannot connect to reduce node");
-                          sock.wait(sock.wait_write);
-                          boost::asio::write(sock, boost::asio::buffer(to_json(res)), boost::asio::transfer_all(), ec);
-                          if (ec)
-                              throw std::runtime_error("fail during writing to socket");
-                      } catch (std::exception &e) {
-                          std::cerr << "Couldn't send data to reduce node: " << e.what() << std::endl;
-                          exit(1);
-                      }
-                      std::cout << "Successfully sent one input: " << key->to_string() << ":" << value->to_string()
-                                << std::endl;
-                  });
+    std::vector<std::thread> thread_vector;
+    constexpr int THREAD_NUM = 4;
+    thread_vector.reserve(THREAD_NUM);
+    double step = key_value_ins.size() / static_cast<double>(THREAD_NUM);
+    for (unsigned int i = 0; i < THREAD_NUM - 1; i++) {
+        thread_vector.emplace_back(process_part, key_value_ins.begin() + std::floor(i * step),
+                                   key_value_ins.begin() + std::floor((i + 1) * step),
+                                   std::cref(cfg),
+                                   std::cref(reduce_ep));
+    }
+    process_part(key_value_ins.begin() + std::floor((THREAD_NUM - 1) * step), key_value_ins.end(), cfg, reduce_ep);
 }
