@@ -52,12 +52,12 @@ Implement `Map` and `Reduce` classes inherited by `map_base` and `reduce_base` i
 Implement function `std::shared_ptr<job_config> get_config()`, which will return config with `map`,`reduce` functions, and
 Factories for `key_in`, `key_out`, `value_in`, `value_out`, `value_res`. For better understanding next diagram:
 <pre>
-                map                     groupby                      reduce
-key_in, key_out ==> key_out, value_out  
-key_in, key_out ==> key_out, value_out  
-key_in, key_out ==> key_out, value_out  ======> key_out, [value_out] =====> key_out, value_res
-key_in, key_out ==> key_out, value_out 
-key_in, key_out ==> key_out, value_out  
+                 map                     groupby                      reduce
+key_in, value_in ==> key_out, value_out  
+key_in, value_in ==> key_out, value_out  
+key_in, value_in ==> key_out, value_out  ======> key_out, [value_out] =====> key_out, value_res
+key_in, value_in ==> key_out, value_out 
+key_in, value_in ==> key_out, value_out  
 </pre>
 
 ### Shared library
