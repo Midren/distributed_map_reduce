@@ -16,7 +16,6 @@ std::pair<std::string, unsigned int> parse_ip_port(const std::string &address) {
 }
 
 std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
-
 get_key_values_from_csv(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
                         std::unique_ptr<KeyValueTypeFactory> &value_factory, char delimiter, char end_of_line) {
     std::vector<std::string> key_values;

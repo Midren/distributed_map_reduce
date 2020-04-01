@@ -14,13 +14,12 @@ static std::mutex map_mutex;
 
 void
 reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
-       const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::address &ip, unsigned int port_num) {
+       const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::tcp::endpoint &ep) {
     for (;;) {
         auto[key, values] = q->pop();
         auto res = cfg->reduce_class->reduce(key, values);
 
         boost::asio::io_service service;
-        boost::asio::ip::tcp::endpoint ep(ip, port_num);
         boost::asio::ip::tcp::socket sock(service);
         try {
             sock.connect(ep);

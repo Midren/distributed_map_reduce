@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto dll_file = vm["config_file"].as<std::filesystem::path>();
     auto[master_ip_str, master_port] = parse_ip_port(vm["master_node_address"].as<std::string>());
+    auto master_ep = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(master_ip_str), master_port);
     auto map_cnt = vm["input_num"].as<unsigned int>();
     auto port = vm["port"].as<unsigned int>();
 
@@ -69,9 +70,8 @@ int main(int argc, char **argv) {
     for (auto i = 0; i < THREAD_NUM; i++)
         thread_vector.emplace_back([&io_service] { io_service.run(); });
 
-    auto ip = boost::asio::ip::address::from_string(master_ip_str);
     for (auto i = 0; i < THREAD_NUM; i++)
-        thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(ip), master_port);
+        thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(master_ep));
     io_service.run();
 }
 

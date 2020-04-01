@@ -8,7 +8,8 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <boost/asio/ip/address.hpp>
+
+#include <boost/asio/ip/tcp.hpp>
 
 #include "../types/KeyValueType.h"
 #include "../configurator/JobConfig.h"
@@ -24,7 +25,7 @@ struct ComparePointee {
 
 void
 reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
-       const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::address &ip, unsigned int port_num);
+       const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::tcp::endpoint &ep);
 
 void
 process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
