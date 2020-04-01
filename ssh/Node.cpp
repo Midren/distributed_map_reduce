@@ -31,7 +31,7 @@ void Node::connect() {
     }
     if (session.userauthPublickeyAuto() != SSH_AUTH_SUCCESS) {
         if (session.userauthPassword("mapreduce") != SSH_AUTH_SUCCESS) {
-            throw std::runtime_error("Didn't auth");
+            throw std::runtime_error("Cannot auth to remote node");
         }
     }
 }
@@ -58,7 +58,11 @@ std::string Node::execute_command(const std::string &cmd, bool is_output) {
 void Node::scp_write_file(const std::filesystem::path &path_to_file, const std::string &text) {
     Scp scp(session, SSH_SCP_WRITE, path_to_file.parent_path());
     scp.push_file(path_to_file.filename().c_str(), text.length(), S_IRUSR | S_IWUSR);
-    scp.write(text);
+    try {
+        scp.write(text);
+    } catch (std::exception &e) {
+        throw std::runtime_error("Cannot write to remote file: " + path_to_file.string());
+    }
 }
 
 std::string Node::scp_read_file(const std::filesystem::path &path_to_file) {
