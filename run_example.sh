@@ -1,3 +1,4 @@
+#!/bin/sh
 cd ..
 docker kill $(docker ps -q)
 for i in 1 2 3 4 5
