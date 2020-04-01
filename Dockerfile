@@ -39,7 +39,7 @@ RUN useradd -m mapreduce --create-home && \
 
 USER mapreduce
 WORKDIR /home/mapreduce
-#RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distributed_map_reduce && \
+#RUN git clone https://github.com/RomanMilishchuk/distributed_map_reduce && \
 #    cd distributed_map_reduce && \
 #    mkdir build && \
 #    cd build && \
