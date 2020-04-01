@@ -46,10 +46,10 @@ and `std::string to_string() const` methods. Or you can use implemented primitiv
 custom `KeyValueTypeFactory` for this type.
 
 ### Map/Reduce
-Implement `Map` and `Reduce` classes inherited by `map_base` and `ReduceBase` interfaces.
+Implement `Map` and `Reduce` classes inherited by `map_base` and `reduce_base` interfaces.
 
 ### JobConfig
-Implement function `std::shared_ptr<JobConfig> get_config()`, which will return config with `map`,`reduce` functions, and
+Implement function `std::shared_ptr<job_config> get_config()`, which will return config with `map`,`reduce` functions, and
 Factories for `key_in`, `key_out`, `value_in`, `value_out`, `value_res`. For better understanding next diagram:
 <pre>
                 map                     groupby                      reduce
@@ -61,7 +61,7 @@ key_in, key_out ==> key_out, value_out
 </pre>
 
 ### Shared library
-Nextly, you need to make shared library with `std::shared_ptr<JobConfig> get_config()` function
+Nextly, you need to make shared library with `std::shared_ptr<job_config> get_config()` function
 
 ### Run
 You can use blocking `run_task_blocking` function or non-blocking `run_task`, which will return `std::future`. All data
