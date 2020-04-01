@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/use_future.hpp>
 
-#include "ssh/Node.h"
+#include "ssh/node.h"
 #include "util.h"
 #include "configurator/config.h"
 
@@ -46,7 +46,7 @@ get_result(const std::shared_ptr<JobConfig> &cfg) {
 }
 
 static void
-send_config(Node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string &config_name) {
+send_config(ssh::node &n, const fs::path &base_directory, const fs::path &dll_path, const std::string &config_name) {
     n.execute_command("mkdir " + ("~" / base_directory).string() + " 2> /dev/null", false);
     n.scp_send_file(dll_path, base_directory / config_name);
     n.execute_command("chmod +x " + ("~" / base_directory / config_name).string(), false);
@@ -58,7 +58,7 @@ run_reduce_node(const std::string &reduce_address, const std::string &master_add
     auto[reduce_ip, reduce_port] = parse_ip_port(reduce_address);
     auto[master_ip, master_port] = parse_ip_port(master_address);
     const fs::path reduce_node_path("reduce_node");
-    Node reduce_node(reduce_ip);
+    ssh::node reduce_node(reduce_ip);
 
     reduce_node.connect();
     send_config(reduce_node, base_directory, dll_path, "libreduce_config.so");
@@ -78,7 +78,7 @@ void run_map_nodes(const std::vector<std::string> &map_ips, const std::string &r
     auto[reduce_ip, reduce_port] = parse_ip_port(reduce_address);
     const fs::path map_node_path("map_node");
     for (auto &map_ip: map_ips) {
-        Node map_node(map_ip);
+        ssh::node map_node(map_ip);
         map_node.connect();
         send_config(map_node, base_directory, dll_path, "libmap_config.so");
         map_node.execute_command(

@@ -10,7 +10,7 @@ FIND_PACKAGE(Threads REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${LIBSSH_INCLUDE_DIRS})
 
-add_library(map_reduce STATIC map_reduce.cpp configurator/config.cpp types/KeyValueTypeFactory.cpp ssh/Node.cpp ssh/Scp.cpp util.cpp)
+add_library(map_reduce STATIC map_reduce.cpp configurator/config.cpp types/KeyValueTypeFactory.cpp ssh/node.cpp ssh/scp.cpp util.cpp)
 target_link_libraries(map_reduce PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} stdc++fs -ldl -lssh)
 
 add_executable(map_node map_node/map_node.cpp types/KeyValueTypeFactory.cpp)
