@@ -20,9 +20,11 @@ public:
     virtual ~KeyValueType() = default;
 };
 
-//TODO: add SFINAE to instantiate only with pod types
+template<typename T, class Enable =void>
+class PrimitiveKeyValueType;
+
 template<typename T>
-class PrimitiveKeyValueType : public KeyValueType {
+class PrimitiveKeyValueType<T, typename std::enable_if_t<std::is_pod_v<T>>> : public KeyValueType {
 public:
     PrimitiveKeyValueType() = default;
 

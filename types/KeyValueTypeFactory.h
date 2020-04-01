@@ -14,7 +14,7 @@ public:
     virtual std::unique_ptr<KeyValueType> create(const std::string &str) = 0;
 };
 
-template<typename T>
+template<typename T, typename = std::enable_if_t<std::is_pod_v<T>>>
 class PrimitiveKeyValueTypeFactory : public KeyValueTypeFactory {
 public:
     std::unique_ptr<KeyValueType> create() override {
