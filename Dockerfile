@@ -39,13 +39,13 @@ RUN useradd -m mapreduce --create-home && \
 
 USER mapreduce
 WORKDIR /home/mapreduce
-RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distributed_map_reduce && \
-    cd distributed_map_reduce && \
-    mkdir build && \
-    cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release && \
-    make && \
-    make install
+#RUN git clone https://github.com/RomanMilishchuk/DistributedMapReduce distributed_map_reduce && \
+#    cd distributed_map_reduce && \
+#    mkdir build && \
+#    cd build && \
+#    cmake .. -DCMAKE_BUILD_TYPE=Release && \
+#    make && \
+#    make install
 
 
 ENTRYPOINT echo "mapreduce" | sudo -S service ssh restart && \

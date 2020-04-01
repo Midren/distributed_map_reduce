@@ -20,7 +20,7 @@ void reduce(ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>,
 
     boost::asio::io_service service;
     //TODO: remove hardcoded constants
-    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("127.0.0.1"), 8002);
+    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("172.17.0.7"), 8002);
     boost::asio::ip::tcp::socket sock(service);
     try {
         sock.connect(ep);
