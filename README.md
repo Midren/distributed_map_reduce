@@ -46,7 +46,7 @@ and `std::string to_string() const` methods. Or you can use implemented primitiv
 custom `KeyValueTypeFactory` for this type.
 
 ### Map/Reduce
-Implement `Map` and `Reduce` classes inherited by `MapBase` and `ReduceBase` interfaces.
+Implement `Map` and `Reduce` classes inherited by `map_base` and `ReduceBase` interfaces.
 
 ### JobConfig
 Implement function `std::shared_ptr<JobConfig> get_config()`, which will return config with `map`,`reduce` functions, and

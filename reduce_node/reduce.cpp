@@ -18,7 +18,7 @@ namespace map_reduce {
 
     void
     reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
-           const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::tcp::endpoint &ep) {
+           const std::shared_ptr<job_config> &cfg, const boost::asio::ip::tcp::endpoint &ep) {
         for (;;) {
             auto[key, values] = q->pop();
             auto res = cfg->reduce_class->reduce(key, values);
@@ -37,7 +37,7 @@ namespace map_reduce {
 
     void
     process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>> >>> &queue,
-            const std::string &json, int map_cnt, const std::shared_ptr<JobConfig> &cfg) {
+            const std::string &json, int map_cnt, const std::shared_ptr<job_config> &cfg) {
         std::cout << "One more input" << std::endl;
         auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory, cfg->value_out_factory);
         map_mutex.lock();

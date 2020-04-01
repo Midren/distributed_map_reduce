@@ -14,12 +14,12 @@
 
 namespace map_reduce {
     static std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
-    get_result(const std::shared_ptr<JobConfig> &cfg) {
+    get_result(const std::shared_ptr<job_config> &cfg) {
         std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType >>> promise;
         auto future = promise.get_future();
 
         std::thread([](std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> promise,
-                       const std::shared_ptr<JobConfig> &cfg) {
+                       const std::shared_ptr<job_config> &cfg) {
             using namespace boost::asio::ip;
             boost::asio::io_context io_service;
             tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 8002));

@@ -7,7 +7,7 @@
 #include <cmath>
 
 #include "../util.h"
-#include "../configurator/JobConfig.h"
+#include "../configurator/job_config.h"
 #include "../configurator/config.h"
 
 #include <boost/asio.hpp>
@@ -21,7 +21,7 @@ po::variables_map parse_args(int argc, char **argv) {
     allowed.add_options()
             ("help,h", "Show help")
             ("config_file,c", po::value<std::filesystem::path>()->default_value("libmap_reduce_config.so"),
-             "Path to JobConfig dll for map/reduce")
+             "Path to job_config dll for map/reduce")
             ("input_file,I", po::value<std::filesystem::path>()->required(), "Path to input file with data to map")
             ("reduce_node_address,O", po::value<std::string>()->required(), "Address of reduce node");
 
@@ -54,7 +54,7 @@ std::string read_data(const std::filesystem::path &file) {
 void
 process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator beg,
              std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator end,
-             const std::shared_ptr<JobConfig> &cfg,
+             const std::shared_ptr<job_config> &cfg,
              const boost::asio::ip::tcp::endpoint &reduce_ep) {
     boost::asio::io_service service;
     std::for_each(beg, end,

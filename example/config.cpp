@@ -3,13 +3,13 @@
 
 #include <numeric>
 #include <memory>
-#include "../configurator/JobConfig.h"
+#include "../configurator/job_config.h"
 
 using map_reduce::KeyValueType;
 using map_reduce::IntKeyValueType;
 using map_reduce::IntKeyValueTypeFactory;
 
-class SquareMap : public map_reduce::MapBase {
+class square_map : public map_reduce::map_base {
 public:
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
@@ -19,7 +19,7 @@ public:
     };
 };
 
-class SumReduce : public map_reduce::ReduceBase {
+class sum_reduce : public map_reduce::reduce_base {
 public:
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     reduce(const std::unique_ptr<KeyValueType> &key,
@@ -32,10 +32,10 @@ public:
     }
 };
 
-std::shared_ptr<JobConfig> get_config() {
-    return std::make_shared<JobConfig>("sum of squares",
-                                       std::move(std::make_unique<SquareMap>()),
-                                       std::move(std::make_unique<SumReduce>()),
+std::shared_ptr<job_config> get_config() {
+    return std::make_shared<job_config>("sum of squares",
+                                       std::move(std::make_unique<square_map>()),
+                                       std::move(std::make_unique<sum_reduce>()),
                                        std::move(std::make_unique<IntKeyValueTypeFactory>()),
                                        std::move(std::make_unique<IntKeyValueTypeFactory>()),
                                        std::move(std::make_unique<IntKeyValueTypeFactory>()),

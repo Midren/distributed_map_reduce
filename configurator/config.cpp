@@ -14,7 +14,7 @@ namespace map_reduce {
         });
     }
 
-    std::shared_ptr<JobConfig> get_config(const std::shared_ptr<void> &config_dll_handler) {
+    std::shared_ptr<job_config> get_config(const std::shared_ptr<void> &config_dll_handler) {
         return ((get_config_t) dlsym(config_dll_handler.get(), "get_config"))();
     }
 }

@@ -11,9 +11,9 @@ namespace map_reduce {
 
     using boost::asio::ip::tcp;
 
-    class Session : public std::enable_shared_from_this<Session> {
+    class session : public std::enable_shared_from_this<session> {
     public:
-        Session(tcp::socket socket, const std::shared_ptr<std::function<void(const std::string &)>> &json_handler)
+        session(tcp::socket socket, const std::shared_ptr<std::function<void(const std::string &)>> &json_handler)
                 : socket_(
                 std::move(socket)), json_handler(json_handler) {}
 
@@ -46,10 +46,10 @@ namespace map_reduce {
         const std::shared_ptr<std::function<void(const std::string &)>> &json_handler;
     };
 
-    class JsonServer {
+    class json_server {
     public:
-        JsonServer(boost::asio::io_context &io_service, short port,
-                   const std::shared_ptr<std::function<void(const std::string &)>> &handler)
+        json_server(boost::asio::io_context &io_service, short port,
+                    const std::shared_ptr<std::function<void(const std::string &)>> &handler)
                 : acceptor_(io_service), socket_(io_service), json_handler(handler) {
             boost::system::error_code ec;
             auto endpoint = tcp::endpoint(tcp::v4(), port);
@@ -69,7 +69,7 @@ namespace map_reduce {
             acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
                 std::cout << "Accepted connection" << std::endl;
                 if (!ec) {
-                    std::make_shared<Session>(std::move(socket_), json_handler)->start();
+                    std::make_shared<session>(std::move(socket_), json_handler)->start();
                 } else {
                     std::cout << "Couldn't accept connection: " << ec.message() << std::endl;
                 }
