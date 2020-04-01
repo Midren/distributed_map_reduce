@@ -1,11 +1,15 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include <boost/asio.hpp>
+#include <iostream>
+#include <filesystem>
+
 #include <boost/program_options.hpp>
 
 #include "json_server.h"
 #include "reduce.h"
+
+#include "../configurator/config.h"
 #include "../util.h"
 
 namespace po = boost::program_options;
