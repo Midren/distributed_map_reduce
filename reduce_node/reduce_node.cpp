@@ -46,7 +46,7 @@ po::variables_map parse_args(int argc, char **argv) {
 int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto dll_file = vm["config_file"].as<std::filesystem::path>();
-    auto master_ip_port = parse_ip_port(vm["master_node_address"].as<std::string>());
+    auto[master_ip_str, master_port] = parse_ip_port(vm["master_node_address"].as<std::string>());
     auto map_cnt = vm["input_num"].as<unsigned int>();
     auto port = vm["port"].as<unsigned int>();
 
@@ -61,12 +61,17 @@ int main(int argc, char **argv) {
                 return process(queue, json, map_cnt, cfg);
             });
 
-    std::cout << "Started server" << std::endl;
     JsonServer s(io_service, port, json_handler);
 
-//    std::thread(reduce,)
-//    reduce(queue, cfg);
+    std::vector<std::thread> thread_vector;
+    constexpr int THREAD_NUM = 4;
+    thread_vector.reserve(THREAD_NUM);
+    for (auto i = 0; i < THREAD_NUM; i++)
+        thread_vector.emplace_back([&io_service] { io_service.run(); });
+
+    auto ip = boost::asio::ip::address::from_string(master_ip_str);
+    for (auto i = 0; i < THREAD_NUM; i++)
+        thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(ip), master_port);
     io_service.run();
-    std::cout << "Io service stopped" << std::endl;
 }
 

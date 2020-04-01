@@ -14,20 +14,21 @@ static std::mutex map_mutex;
 
 void
 reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
-       const std::shared_ptr<JobConfig> &cfg) {
-    auto[key, values] = q->pop();
-    auto res = cfg->reduce_class->reduce(key, values);
+       const std::shared_ptr<JobConfig> &cfg, const boost::asio::ip::address &ip, unsigned int port_num) {
+    for (;;) {
+        auto[key, values] = q->pop();
+        auto res = cfg->reduce_class->reduce(key, values);
 
-    boost::asio::io_service service;
-    //TODO: remove hardcoded constants
-    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string("172.17.0.7"), 8002);
-    boost::asio::ip::tcp::socket sock(service);
-    try {
-        sock.connect(ep);
-        sock.write_some(boost::asio::buffer(to_json(res)));
-        sock.close();
-    } catch (std::exception &e) {
-        throw std::runtime_error("Couldn't send data to master node: " + std::string(e.what()));
+        boost::asio::io_service service;
+        boost::asio::ip::tcp::endpoint ep(ip, port_num);
+        boost::asio::ip::tcp::socket sock(service);
+        try {
+            sock.connect(ep);
+            sock.write_some(boost::asio::buffer(to_json(res)));
+            sock.close();
+        } catch (std::exception &e) {
+            throw std::runtime_error("Couldn't send data to master node: " + std::string(e.what()));
+        }
     }
 }
 
@@ -45,7 +46,6 @@ process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValue
             auto values = std::vector<std::unique_ptr<KeyValueType>>{};
             values.push_back(std::move(value));
             queue->push(make_pair(std::move(key), std::move(values)));
-            reduce(queue, cfg);
         } else {
             key_values[std::move(key)].push_back(std::move(value));
             map_mutex.unlock();
@@ -59,7 +59,6 @@ process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValue
             map_mutex.unlock();
             std::cout << "All data for this key has come" << std::endl;
             queue->push(make_pair(std::move(key), std::move(values)));
-            reduce(queue, cfg);
         } else {
             key_values[std::move(key)].push_back(std::move(value));
             map_mutex.unlock();
