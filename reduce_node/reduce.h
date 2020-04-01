@@ -21,9 +21,12 @@ struct ComparePointee {
     }
 };
 
-void reduce(ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>> &q,
-            const std::shared_ptr<JobConfig> &cfg);
+void
+reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>>& q,
+       const std::shared_ptr<JobConfig> &cfg);
 
-void process(const std::string &json, int map_cnt, const std::shared_ptr<JobConfig> &cfg);
+void
+process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>>& q,
+        const std::string &json, int map_cnt, const std::shared_ptr<JobConfig> &cfg);
 
 #endif //MAP_REDUCE_REDUCE_H

@@ -59,8 +59,8 @@ int main(int argc, char **argv) {
     auto library_handler = get_config_dll_handler(dll_file);
     auto cfg = get_config(library_handler);
 
-    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip_address), port);
     boost::asio::io_service service;
+    boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip_address), port);
 
     auto key_value_ins = get_key_values_from_csv(read_data(input_file), cfg->key_in_factory, cfg->value_in_factory);
     std::for_each(key_value_ins.begin(), key_value_ins.end(),
@@ -68,14 +68,22 @@ int main(int argc, char **argv) {
                       const auto &[key, value] = key_value;;
                       auto res = cfg->map_class->map(key, value);
 
-                      boost::asio::ip::tcp::socket sock(service);
                       try {
-                          sock.connect(ep);
-                          sock.write_some(boost::asio::buffer(to_json(res)));
-                          sock.close();
+                          boost::system::error_code ec;
+                          boost::asio::ip::tcp::socket sock(service);
+                          sock.connect(ep, ec);
+                          sock.non_blocking(false);
+                          if (ec)
+                              throw std::runtime_error("cannot connect to reduce node");
+                          sock.wait(sock.wait_write);
+                          boost::asio::write(sock, boost::asio::buffer(to_json(res)), boost::asio::transfer_all(), ec);
+                          if (ec)
+                              throw std::runtime_error("fail during writing to socket");
                       } catch (std::exception &e) {
                           std::cerr << "Couldn't send data to reduce node: " << e.what() << std::endl;
                           exit(1);
                       }
+                      std::cout << "Successfully sent one input: " << key->to_string() << ":" << value->to_string()
+                                << std::endl;
                   });
 }

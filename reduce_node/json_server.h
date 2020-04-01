@@ -11,7 +11,8 @@ using boost::asio::ip::tcp;
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
-    Session(tcp::socket socket, const std::function<void(const std::string &)> &json_handler) : socket_(
+    Session(tcp::socket socket, const std::shared_ptr<std::function<void(const std::string &)>> &json_handler)
+            : socket_(
             std::move(socket)), json_handler(json_handler) {}
 
     void start() {
@@ -24,10 +25,15 @@ private:
                                 [this, self = shared_from_this(), json](boost::system::error_code ec,
                                                                         std::size_t length) {
                                     if (!ec) {
+                                        std::cout << "Entering" << std::endl;
                                         do_read(json + std::string(buf.data(), length));
+                                        std::cout << "Leaving" << std::endl;
                                     } else {
-                                        json_handler(json);
-                                        socket_.close();
+                                        std::cout << ec.message() << std::endl;
+                                        std::cout << json << std::endl;
+                                        json_handler->operator()(json);
+                                        std::cout << "Ended json processing" << std::endl;
+//                                        socket_.shutdown(tcp::socket::shutdown_send, ec);
                                     }
                                 });
     }
@@ -35,33 +41,43 @@ private:
     tcp::socket socket_;
     static constexpr unsigned int max_length = 1024;
     std::array<char, max_length> buf;
-    const std::function<void(const std::string &)> &json_handler;
+    const std::shared_ptr<std::function<void(const std::string &)>> &json_handler;
 };
 
 class JsonServer {
 public:
-    JsonServer(boost::asio::io_context &io_service, short port, const std::function<void(const std::string &)> &handler)
-            : acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
-              socket_(io_service), json_handler(handler) {
-        do_accept();
-    }
+    JsonServer(boost::asio::io_context &io_service, short port,
+               const std::shared_ptr<std::function<void(const std::string &)>> &handler)
+            : acceptor_(io_service), socket_(io_service), json_handler(handler) {
+        boost::system::error_code ec;
+        auto endpoint = tcp::endpoint(tcp::v4(), port);
 
-    void close() {
-        acceptor_.close();
+        acceptor_.open(endpoint.protocol(), ec);
+        acceptor_.bind(endpoint, ec);
+        acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
+
+        if (ec)
+            throw std::runtime_error("Server creation error: " + ec.message());
+        do_accept();
     }
 
 private:
     void do_accept() {
+        std::cout << "Waiting for a new connection..." << std::endl;
         acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
-            if (!ec)
+            std::cout << "Accepted connection" << std::endl;
+            if (!ec) {
                 std::make_shared<Session>(std::move(socket_), json_handler)->start();
+            } else {
+                std::cout << "Couldn't accept connection: " << ec.message() << std::endl;
+            }
             do_accept();
         });
     }
 
     tcp::acceptor acceptor_;
     tcp::socket socket_;
-    const std::function<void(const std::string &)> &json_handler;
+    const std::shared_ptr<std::function<void(const std::string &)>> &json_handler;
 };
 
 #endif //MAP_REDUCE_REDUCE_SERVER_H

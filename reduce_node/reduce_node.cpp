@@ -6,6 +6,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "concurrent_queue.h"
 #include "json_server.h"
 #include "reduce.h"
 
@@ -53,11 +54,19 @@ int main(int argc, char **argv) {
     auto cfg = get_config(library_handler);
 
     boost::asio::io_context io_service;
+    auto queue = std::make_shared<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>>();
 
-    JsonServer s(io_service, port, [&](const std::string &json) {
-        return process(json, map_cnt, cfg);
-    });
+    auto json_handler = std::make_shared<std::function<void(const std::string &)>>(
+            [&](const std::string &json) mutable {
+                return process(queue, json, map_cnt, cfg);
+            });
 
+    std::cout << "Started server" << std::endl;
+    JsonServer s(io_service, port, json_handler);
+
+//    std::thread(reduce,)
+//    reduce(queue, cfg);
     io_service.run();
+    std::cout << "Io service stopped" << std::endl;
 }
 
