@@ -9,8 +9,10 @@
 
 #include "JobConfig.h"
 
-std::shared_ptr<void> get_config_dll_handler(const std::filesystem::path &path);
+namespace map_reduce {
+    std::shared_ptr<void> get_config_dll_handler(const std::filesystem::path &path);
 
-std::shared_ptr<JobConfig> get_config(const std::shared_ptr<void> &config_dll_handler);
+    std::shared_ptr<JobConfig> get_config(const std::shared_ptr<void> &config_dll_handler);
+}
 
 #endif //MAP_REDUCE_CONFIG_H

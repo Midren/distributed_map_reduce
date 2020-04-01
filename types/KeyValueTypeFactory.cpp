@@ -3,15 +3,16 @@
 
 #include "KeyValueTypeFactory.h"
 
-template
-class PrimitiveKeyValueTypeFactory<char>;
+namespace map_reduce {
+    template
+    class PrimitiveKeyValueTypeFactory<char>;
 
-template
-class PrimitiveKeyValueTypeFactory<int>;
+    template
+    class PrimitiveKeyValueTypeFactory<int>;
 
-template
-class PrimitiveKeyValueTypeFactory<double>;
+    template
+    class PrimitiveKeyValueTypeFactory<double>;
 
-template
-class PrimitiveKeyValueTypeFactory<long>;
-
+    template
+    class PrimitiveKeyValueTypeFactory<long>;
+}

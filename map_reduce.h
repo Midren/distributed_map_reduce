@@ -12,14 +12,16 @@
 
 #include "types/KeyValueType.h"
 
-namespace fs = std::filesystem;
+namespace map_reduce {
+    namespace fs = std::filesystem;
 
-std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
-run_task(const std::vector<std::string> &map_ips, const std::string &reduce_address, const std::string &master_address,
-         const fs::path &map_input_file, const fs::path &dll_path);
+    std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
+    run_task(const std::vector<std::string> &map_ips, const std::string &reduce_address,
+             const std::string &master_address,
+             const fs::path &map_input_file, const fs::path &dll_path);
 
-std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
-run_task_blocking(const std::vector<std::string> &map_ips, const std::string &reduce_address,
-                  const std::string &master_address, const fs::path &map_input_file, const fs::path &dll_path);
-
+    std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    run_task_blocking(const std::vector<std::string> &map_ips, const std::string &reduce_address,
+                      const std::string &master_address, const fs::path &map_input_file, const fs::path &dll_path);
+}
 #endif //MAP_REDUCE_MAP_REDUCE_H

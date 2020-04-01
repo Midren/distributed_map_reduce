@@ -11,16 +11,20 @@
 #include "MapBase.h"
 #include "../types/KeyValueTypeFactory.h"
 
+//using map_reduce::MapBase;
+//using map_reduce::ReduceBase;
+//using map_reduce::KeyValueTypeFactory;
+
 class JobConfig {
 public:
     JobConfig(std::string job_name,
-              std::unique_ptr<MapBase> map_class,
-              std::unique_ptr<ReduceBase> reduce_class,
-              std::unique_ptr<KeyValueTypeFactory> key_in_factory,
-              std::unique_ptr<KeyValueTypeFactory> key_out_factory,
-              std::unique_ptr<KeyValueTypeFactory> value_in_factory,
-              std::unique_ptr<KeyValueTypeFactory> value_out_factory,
-              std::unique_ptr<KeyValueTypeFactory> value_res_factory
+              std::unique_ptr<map_reduce::MapBase> map_class,
+              std::unique_ptr<map_reduce::ReduceBase> reduce_class,
+              std::unique_ptr<map_reduce::KeyValueTypeFactory> key_in_factory,
+              std::unique_ptr<map_reduce::KeyValueTypeFactory> key_out_factory,
+              std::unique_ptr<map_reduce::KeyValueTypeFactory> value_in_factory,
+              std::unique_ptr<map_reduce::KeyValueTypeFactory> value_out_factory,
+              std::unique_ptr<map_reduce::KeyValueTypeFactory> value_res_factory
     )
             : job_name(std::move(job_name)),
               map_class(std::move(map_class)),
@@ -32,16 +36,14 @@ public:
               value_res_factory(std::move(value_res_factory)) {};
 
     std::string job_name;
-    std::unique_ptr<MapBase> map_class;
-    std::unique_ptr<ReduceBase> reduce_class;
-    std::unique_ptr<KeyValueTypeFactory> key_in_factory;
-    std::unique_ptr<KeyValueTypeFactory> key_out_factory;
-    std::unique_ptr<KeyValueTypeFactory> value_in_factory;
-    std::unique_ptr<KeyValueTypeFactory> value_out_factory;
-    std::unique_ptr<KeyValueTypeFactory> value_res_factory;
+    std::unique_ptr<map_reduce::MapBase> map_class;
+    std::unique_ptr<map_reduce::ReduceBase> reduce_class;
+    std::unique_ptr<map_reduce::KeyValueTypeFactory> key_in_factory;
+    std::unique_ptr<map_reduce::KeyValueTypeFactory> key_out_factory;
+    std::unique_ptr<map_reduce::KeyValueTypeFactory> value_in_factory;
+    std::unique_ptr<map_reduce::KeyValueTypeFactory> value_out_factory;
+    std::unique_ptr<map_reduce::KeyValueTypeFactory> value_res_factory;
 };
-
-extern JobConfig job_config;
 
 extern "C"
 {
@@ -49,5 +51,4 @@ typedef std::shared_ptr<JobConfig> (*get_config_t)();
 
 std::shared_ptr<JobConfig> get_config();
 }
-
 #endif //MAP_REDUCE_JOB_CONFIG_H

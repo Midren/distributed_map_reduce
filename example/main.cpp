@@ -7,6 +7,8 @@
 
 #include "../map_reduce.h"
 
+namespace fs = std::filesystem;
+
 int main() {
     std::vector<std::string> map_ips = {"172.17.0.2", "172.17.0.3", "172.17.0.4", "172.17.0.5"};
     const std::string reduce_address = "172.17.0.6:8001";
@@ -16,7 +18,7 @@ int main() {
     fs::path map_input_file = home_dir / "distributed_map_reduce/example/input.csv";
     fs::path dll_path = home_dir / "distributed_map_reduce/example/build/libmap_reduce_config.so";
 
-    auto[key, value] = run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
+    auto[key, value] = map_reduce::run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
 
     std::cout << "The result of Map/Reduce is " << value->to_string() << std::endl;
 

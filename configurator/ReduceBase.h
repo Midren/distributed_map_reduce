@@ -8,11 +8,13 @@
 #include <vector>
 #include "../types/KeyValueType.h"
 
-class ReduceBase {
-public:
-    virtual std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
-    reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &inputs) = 0;
-};
+namespace map_reduce {
+    class ReduceBase {
+    public:
+        virtual std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+        reduce(const std::unique_ptr<KeyValueType> &key, const std::vector<std::unique_ptr<KeyValueType>> &inputs) = 0;
+    };
+}
 
 
 #endif //MAP_REDUCE_REDUCEBASE_H

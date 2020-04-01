@@ -5,7 +5,11 @@
 #include <memory>
 #include "../configurator/JobConfig.h"
 
-class SquareMap : public MapBase {
+using map_reduce::KeyValueType;
+using map_reduce::IntKeyValueType;
+using map_reduce::IntKeyValueTypeFactory;
+
+class SquareMap : public map_reduce::MapBase {
 public:
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
@@ -15,7 +19,7 @@ public:
     };
 };
 
-class SumReduce : public ReduceBase {
+class SumReduce : public map_reduce::ReduceBase {
 public:
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     reduce(const std::unique_ptr<KeyValueType> &key,

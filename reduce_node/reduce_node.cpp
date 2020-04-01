@@ -13,6 +13,7 @@
 #include "../configurator/config.h"
 #include "../util.h"
 
+using namespace map_reduce;
 namespace po = boost::program_options;
 
 po::variables_map parse_args(int argc, char **argv) {
@@ -47,7 +48,8 @@ int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto dll_file = vm["config_file"].as<std::filesystem::path>();
     auto[master_ip_str, master_port] = parse_ip_port(vm["master_node_address"].as<std::string>());
-    auto master_ep = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(master_ip_str), master_port);
+    auto master_ep = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(master_ip_str),
+                                                    master_port);
     auto map_cnt = vm["input_num"].as<unsigned int>();
     auto port = vm["port"].as<unsigned int>();
 
@@ -74,4 +76,3 @@ int main(int argc, char **argv) {
         thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(master_ep));
     io_service.run();
 }
-

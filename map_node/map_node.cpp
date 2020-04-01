@@ -13,7 +13,7 @@
 #include <boost/asio.hpp>
 #include <boost/program_options.hpp>
 
-
+using namespace map_reduce;
 namespace po = boost::program_options;
 
 po::variables_map parse_args(int argc, char **argv) {
@@ -51,10 +51,11 @@ std::string read_data(const std::filesystem::path &file) {
     return dynamic_cast<std::stringstream &>(std::stringstream{} << fin.rdbuf()).str();
 }
 
-void process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator beg,
-                  std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator end,
-                  const std::shared_ptr<JobConfig> &cfg,
-                  const boost::asio::ip::tcp::endpoint &reduce_ep) {
+void
+process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator beg,
+             std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>::iterator end,
+             const std::shared_ptr<JobConfig> &cfg,
+             const boost::asio::ip::tcp::endpoint &reduce_ep) {
     boost::asio::io_service service;
     std::for_each(beg, end,
                   [&cfg, &reduce_ep, &service](const auto &key_value) {
