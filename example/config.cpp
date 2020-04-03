@@ -11,15 +11,17 @@ using map_reduce::IntKeyValueTypeFactory;
 
 class square_map : public map_reduce::map_base {
 public:
-    std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
-    map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
-
+    void map(const std::unique_ptr<KeyValueType> &key, const std::unique_ptr<KeyValueType> &value) override {
         const auto key_in = dynamic_cast<IntKeyValueType &>(*key).value;
         const auto value_in = dynamic_cast<IntKeyValueType &>(*value).value;
 
-        return {std::make_unique<IntKeyValueType>(key_in),
-                std::make_unique<IntKeyValueType>(value_in * value_in)};
+        emit(std::make_unique<IntKeyValueType>(key_in),
+             std::make_unique<IntKeyValueType>(value_in * value_in));
     };
+
+    std::unique_ptr<map_reduce::map_base> clone() override {
+        return std::make_unique<square_map>();
+    }
 };
 
 class sum_reduce : public map_reduce::reduce_base {
