@@ -121,4 +121,7 @@ int main(int argc, char **argv) {
                                    std::cref(reduce_ep));
     }
     process_part(key_value_ins.begin() + std::floor((THREAD_NUM - 1) * step), key_value_ins.end(), cfg, reduce_ep);
+    for (auto &thread: thread_vector)
+        thread.join();
+    send_end_message(reduce_ep);
 }

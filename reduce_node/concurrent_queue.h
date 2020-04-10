@@ -9,7 +9,7 @@
 #include<mutex>
 
 namespace map_reduce {
-    template<class T>
+    template<class T, template<class> class Container=std::deque>
     class ConcurrentQueue {
     public:
         ConcurrentQueue() = default;
@@ -21,9 +21,9 @@ namespace map_reduce {
         T pop();
 
     private:
-        std::deque<T> data;
+        Container<T> data;
         std::condition_variable queue_check;
-        std::mutex deque_mutex;
+        std::mutex container_mutex;
     };
 }
 

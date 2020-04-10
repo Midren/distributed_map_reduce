@@ -6,13 +6,29 @@
 #include <iostream>
 
 #include <boost/asio.hpp>
+#include <queue>
 
 #include "../util.h"
 
 namespace map_reduce {
+    struct ComparePointee {
+        template<typename T>
+        bool operator()(const std::unique_ptr<T> &lhs, const std::unique_ptr<T> &rhs) const {
+            return *lhs < *rhs;
+        }
+    };
 
-//TODO: add hash method for KeyValueType and replace to TBD concurrent_hashmap instead of map + mutex
+    struct CompareFirstPointee {
+        template<typename T>
+        bool operator()(const std::pair<std::unique_ptr<T>, std::vector<std::unique_ptr<T>>> &lhs,
+                        const std::pair<std::unique_ptr<T>, std::vector<std::unique_ptr<T>>> &rhs) const {
+            return ComparePointee()(lhs.first, rhs.first);
+        }
+    };
+
+    //TODO: add hash method for KeyValueType and replace to TBD concurrent_hashmap instead of map + mutex
     static std::map<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>, ComparePointee> key_values;
+    static unsigned int map_finished;
     static std::mutex map_mutex;
 
 
@@ -36,34 +52,34 @@ namespace map_reduce {
     }
 
     void
-    process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>> >>> &queue,
+    process(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &working_queue,
             const std::string &json, int map_cnt, const std::shared_ptr<job_config> &cfg) {
         std::cout << "One more input" << std::endl;
         try {
             auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory, cfg->value_out_factory);
-            map_mutex.lock();
-            auto it = key_values.find(key);
-            if (it == key_values.end()) {
-                key_values[std::move(key)].push_back(std::move(value));
-                map_mutex.unlock();
-            } else {
-                if (it->second.size() == map_cnt - 1) {
-                    auto values = std::move(it->second);
-                    values.push_back(std::move(value));
-                    key_values.erase(it);
-                    map_mutex.unlock();
-                    std::cout << "All data for this key has come" << std::endl;
-                    queue->push(make_pair(std::move(key), std::move(values)));
-                } else {
-                    key_values[std::move(key)].push_back(std::move(value));
-                    map_mutex.unlock();
-                    std::cout << "Added one more input" << std::endl;
-                }
-            }
+            std::lock_guard lg(map_mutex);
+            key_values[std::move(key)].push_back(std::move(value));
         } catch (map_ended &e) {
-            for (auto it = key_values.begin(); it != key_values.end(); it++) {
-                auto nh = key_values.extract(it);
-                queue->push(std::make_pair(std::move(nh.key()), std::move(nh.mapped())));
+            std::cout << "Map node sent all data" << std::endl;
+            std::lock_guard lg(map_mutex);
+            map_finished++;
+
+            if (map_finished == map_cnt) {
+                std::cout << "All inputs were inserted" << std::endl;
+                std::priority_queue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>,
+                        std::vector<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>,
+                        CompareFirstPointee
+                > high_priority_queue;
+
+                while (!key_values.empty()) {
+                    auto nh = key_values.extract(key_values.begin());
+                    high_priority_queue.push(std::make_pair(std::move(nh.key()), std::move(nh.mapped())));
+                }
+                while (!high_priority_queue.empty()) {
+                    working_queue->push(std::move(
+                            const_cast<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>> &>(high_priority_queue.top())));
+                    high_priority_queue.pop();
+                }
             }
         }
     }

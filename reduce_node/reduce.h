@@ -17,13 +17,6 @@
 #include "concurrent_queue.h"
 
 namespace map_reduce {
-    struct ComparePointee {
-        template<typename T>
-        bool operator()(const std::unique_ptr<T> &lhs, const std::unique_ptr<T> &rhs) const {
-            return *lhs < *rhs;
-        }
-    };
-
     void
     reduce(const std::shared_ptr<ConcurrentQueue<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>>>> &q,
            const std::shared_ptr<job_config> &cfg, const boost::asio::ip::tcp::endpoint &ep);
