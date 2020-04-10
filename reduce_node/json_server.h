@@ -27,15 +27,10 @@ namespace map_reduce {
                                     [this, self = shared_from_this(), json](boost::system::error_code ec,
                                                                             std::size_t length) {
                                         if (!ec) {
-                                            std::cout << "Entering" << std::endl;
                                             do_read(json + std::string(buf.data(), length));
-                                            std::cout << "Leaving" << std::endl;
                                         } else {
-                                            std::cout << ec.message() << std::endl;
-                                            std::cout << json << std::endl;
                                             json_handler->operator()(json);
-                                            std::cout << "Ended json processing" << std::endl;
-//                                        socket_.shutdown(tcp::socket::shutdown_send, ec);
+                                            socket_.shutdown(tcp::socket::shutdown_send, ec);
                                         }
                                     });
         }

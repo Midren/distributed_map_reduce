@@ -66,13 +66,18 @@ int main(int argc, char **argv) {
 
     json_server s(io_service, port, json_handler);
 
-    std::vector<std::thread> thread_vector;
+    std::vector<std::thread> server_thread_vector, reduce_thread_vector;
     constexpr int THREAD_NUM = 4;
-    thread_vector.reserve(THREAD_NUM);
+    server_thread_vector.reserve(THREAD_NUM);
+    reduce_thread_vector.reserve(THREAD_NUM);
     for (auto i = 0; i < THREAD_NUM; i++)
-        thread_vector.emplace_back([&io_service] { io_service.run(); });
+        server_thread_vector.emplace_back([&io_service] { io_service.run(); });
 
     for (auto i = 0; i < THREAD_NUM; i++)
-        thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(master_ep));
-    io_service.run();
+        reduce_thread_vector.emplace_back(reduce, std::ref(queue), std::cref(cfg), std::cref(master_ep));
+
+    for (auto &thread: reduce_thread_vector)
+        thread.join();
+
+    io_service.stop();
 }

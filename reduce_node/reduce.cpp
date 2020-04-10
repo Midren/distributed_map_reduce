@@ -37,6 +37,10 @@ namespace map_reduce {
            const std::shared_ptr<job_config> &cfg, const boost::asio::ip::tcp::endpoint &ep) {
         for (;;) {
             auto[key, values] = q->pop();
+            if (key == nullptr) {
+                q->push(std::make_pair(std::move(key), std::move(values)));
+                return;
+            }
             auto res = cfg->reduce_class->reduce(key, values);
 
             boost::asio::io_service service;
@@ -80,6 +84,8 @@ namespace map_reduce {
                             const_cast<std::pair<std::unique_ptr<KeyValueType>, std::vector<std::unique_ptr<KeyValueType>>> &>(high_priority_queue.top())));
                     high_priority_queue.pop();
                 }
+                working_queue->push(std::make_pair(std::unique_ptr<KeyValueType>(nullptr),
+                                                   std::vector<std::unique_ptr<KeyValueType>>{}));
             }
         }
     }
