@@ -24,9 +24,18 @@ namespace map_reduce {
 
     std::string to_json(const std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>> &key_value);
 
+    std::string map_end_message();
+
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
                             std::unique_ptr<KeyValueTypeFactory> &value_factory);
+
+    const std::string map_end_flag = "map_ended";
+
+    class map_ended : public std::runtime_error {
+    public:
+        map_ended(const std::string &msg = "end of the map inputs") : runtime_error(msg) {}
+    };
 }
 
 #endif //MAP_REDUCE_UTIL_H

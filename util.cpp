@@ -55,12 +55,23 @@ namespace map_reduce {
         return ss.str();
     }
 
+    std::string map_end_message() {
+        boost::property_tree::ptree pt{};
+        pt.put(map_end_flag, true);
+
+        std::stringstream ss{};
+        boost::property_tree::json_parser::write_json(ss, pt);
+        return ss.str();
+    }
+
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
     get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
                             std::unique_ptr<KeyValueTypeFactory> &value_factory) {
         boost::property_tree::ptree pt{};
         boost::property_tree::json_parser::read_json(dynamic_cast<std::stringstream &>(std::stringstream{} << data),
                                                      pt);
+        if (pt.get(map_end_flag, false))
+            throw map_ended();
         return {key_factory->create(pt.get("key", "")),
                 value_factory->create(pt.get("value", ""))};
     }

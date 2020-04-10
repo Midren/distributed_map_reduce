@@ -81,6 +81,22 @@ process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_pt
                   });
 }
 
+void send_end_message(const boost::asio::ip::tcp::endpoint &reduce_ep) {
+    boost::asio::io_service service;
+    boost::system::error_code ec;
+    boost::asio::ip::tcp::socket sock(service);
+    sock.connect(reduce_ep, ec);
+    sock.non_blocking(false);
+    if (ec)
+        throw std::runtime_error("cannot connect to reduce node");
+    sock.wait(sock.wait_write);
+    boost::asio::write(sock, boost::asio::buffer(map_end_message()),
+                       boost::asio::transfer_all(),
+                       ec);
+    if (ec)
+        throw std::runtime_error("fail during writing to socket");
+}
+
 int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto input_file = vm["input_file"].as<std::filesystem::path>();
@@ -94,16 +110,15 @@ int main(int argc, char **argv) {
 
     auto key_value_ins = get_key_values_from_csv(read_data(input_file), cfg->key_in_factory, cfg->value_in_factory);
 
-    process_part(key_value_ins.begin(), key_value_ins.end(), cfg, reduce_ep);
-//    std::vector<std::thread> thread_vector;
-//    constexpr int THREAD_NUM = 4;
-//    thread_vector.reserve(THREAD_NUM);
-//    double step = key_value_ins.size() / static_cast<double>(THREAD_NUM);
-//    for (unsigned int i = 0; i < THREAD_NUM - 1; i++) {
-//        thread_vector.emplace_back(process_part, key_value_ins.begin() + std::floor(i * step),
-//                                   key_value_ins.begin() + std::floor((i + 1) * step),
-//                                   std::cref(cfg),
-//                                   std::cref(reduce_ep));
-//    }
-//    process_part(key_value_ins.begin() + std::floor((THREAD_NUM - 1) * step), key_value_ins.end(), cfg, reduce_ep);
+    std::vector<std::thread> thread_vector;
+    constexpr int THREAD_NUM = 4;
+    thread_vector.reserve(THREAD_NUM);
+    double step = key_value_ins.size() / static_cast<double>(THREAD_NUM);
+    for (unsigned int i = 0; i < THREAD_NUM - 1; i++) {
+        thread_vector.emplace_back(process_part, key_value_ins.begin() + std::floor(i * step),
+                                   key_value_ins.begin() + std::floor((i + 1) * step),
+                                   std::cref(cfg),
+                                   std::cref(reduce_ep));
+    }
+    process_part(key_value_ins.begin() + std::floor((THREAD_NUM - 1) * step), key_value_ins.end(), cfg, reduce_ep);
 }
