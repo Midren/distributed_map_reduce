@@ -7,7 +7,7 @@
 #include <boost/program_options.hpp>
 
 #include "concurrent_queue.h"
-#include "json_server.h"
+#include "../json_server.h"
 #include "reduce.h"
 
 #include "../configurator/config.h"

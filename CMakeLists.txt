@@ -16,7 +16,7 @@ target_link_libraries(map_reduce PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRAR
 add_executable(map_node map_node/map_node.cpp)
 target_link_libraries(map_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} map_reduce)
 
-add_executable(reduce_node reduce_node/json_server.h reduce_node/reduce_node.cpp reduce_node/reduce.cpp)
+add_executable(reduce_node json_server.h reduce_node/reduce_node.cpp reduce_node/reduce.cpp)
 target_link_libraries(reduce_node ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} map_reduce)
 
 install(TARGETS map_reduce DESTINATION ${CMAKE_SOURCE_DIR}/lib)

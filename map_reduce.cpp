@@ -10,7 +10,7 @@
 #include "ssh/node.h"
 #include "util.h"
 #include "configurator/config.h"
-#include "reduce_node/json_server.h"
+#include "json_server.h"
 
 
 namespace map_reduce {
