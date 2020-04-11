@@ -9,7 +9,7 @@ FIND_PACKAGE(Threads REQUIRED)
 
 add_library(map_reduce STATIC IMPORTED)
 
-set_property(TARGET map_reduce PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../lib/libmap_reduce.a)
+set_property(TARGET map_reduce PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../../lib/libmap_reduce.a)
 
 add_library(map_reduce_config SHARED config.cpp)
 add_executable(example main.cpp)

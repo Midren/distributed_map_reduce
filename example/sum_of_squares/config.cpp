@@ -3,7 +3,7 @@
 
 #include <numeric>
 #include <memory>
-#include "../configurator/job_config.h"
+#include "../../configurator/job_config.h"
 
 using map_reduce::KeyValueType;
 using map_reduce::IntKeyValueType;
