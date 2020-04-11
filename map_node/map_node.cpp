@@ -81,22 +81,6 @@ process_part(std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_pt
                   });
 }
 
-void send_end_message(const boost::asio::ip::tcp::endpoint &reduce_ep) {
-    boost::asio::io_service service;
-    boost::system::error_code ec;
-    boost::asio::ip::tcp::socket sock(service);
-    sock.connect(reduce_ep, ec);
-    sock.non_blocking(false);
-    if (ec)
-        throw std::runtime_error("cannot connect to reduce node");
-    sock.wait(sock.wait_write);
-    boost::asio::write(sock, boost::asio::buffer(map_end_message()),
-                       boost::asio::transfer_all(),
-                       ec);
-    if (ec)
-        throw std::runtime_error("fail during writing to socket");
-}
-
 int main(int argc, char **argv) {
     auto vm = parse_args(argc, argv);
     auto input_file = vm["input_file"].as<std::filesystem::path>();

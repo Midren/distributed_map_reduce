@@ -10,41 +10,34 @@
 #include "ssh/node.h"
 #include "util.h"
 #include "configurator/config.h"
+#include "reduce_node/json_server.h"
 
 
 namespace map_reduce {
-    static std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
+    static std::future<std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>>
     get_result(const std::shared_ptr<job_config> &cfg) {
-        std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType >>> promise;
+        std::promise<std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType >>>> promise;
         auto future = promise.get_future();
 
-        std::thread([](std::promise<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> promise,
-                       const std::shared_ptr<job_config> &cfg) {
-            using namespace boost::asio::ip;
+        std::thread([cfg](
+                std::promise<std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType >>>> promise) {
             boost::asio::io_context io_service;
-            tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 8002));
-            tcp::socket socket(io_service);
-            acceptor.async_accept(socket, [&socket, cfg, &promise](const boost::system::error_code &err) {
-                std::array<char, 128> buf{};
-                boost::system::error_code error;
-                std::string json;
-                for (;;) {
-                    size_t len = socket.read_some(boost::asio::buffer(buf), error);
-                    if (error == boost::asio::error::eof)
-                        break; // Connection closed cleanly by peer.
-                    else if (error)
-                        throw boost::system::system_error(error); // Some other error.
-                    json += std::string(buf.data(), len);
-                }
-                if (cfg->key_out_factory == nullptr ||
-                    cfg->value_res_factory == nullptr) {
-                    throw std::runtime_error("Key/value factories are null");
-                }
-                auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory, cfg->value_res_factory);
-                promise.set_value(std::make_pair(std::move(key), std::move(value)));
-            });
+            std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> res;
+
+            auto json_handler = std::make_shared<std::function<void(const std::string &)>>(
+                    [&](const std::string &json) mutable {
+                        try {
+                            auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory,
+                                                                       cfg->value_res_factory);
+                            res.emplace_back(std::move(key), std::move(value));
+                        } catch (data_ended_error &e) {
+                            promise.set_value(std::move(res));
+                        }
+                    });
+            json_server s(io_service, 8002, json_handler);
             io_service.run();
-        }, std::move(promise), std::cref(cfg)).detach();
+
+        }, std::move(promise)).detach();
 
         return future;
     }
@@ -97,7 +90,7 @@ namespace map_reduce {
         }
     }
 
-    std::future<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
+    std::future<std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>>
     run_task(const std::vector<std::string> &map_ips, const std::string &reduce_address,
              const std::string &master_address,
              const fs::path &map_input_file, const fs::path &dll_path) {
@@ -121,7 +114,7 @@ namespace map_reduce {
     }
 
 
-    std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
+    std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
     run_task_blocking(const std::vector<std::string> &map_ips, const std::string &reduce_address,
                       const std::string &master_address,
                       const fs::path &map_input_file, const fs::path &dll_path) {

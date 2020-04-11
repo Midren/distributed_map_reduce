@@ -3,6 +3,7 @@
 
 #include "util.h"
 
+#include <iostream>
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
@@ -29,7 +30,7 @@ namespace map_reduce {
         //Remove blank lines or ill-formed lines
         key_values.erase(std::remove_if(key_values.begin(), key_values.end(), [delimiter](const std::string &val) {
             return val.find(delimiter) == std::string::npos;
-        }));
+        }), key_values.end());
 
         std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> key_value_ins;
         std::transform(key_values.begin() + 1, key_values.end(), std::back_inserter(key_value_ins),
@@ -55,13 +56,30 @@ namespace map_reduce {
         return ss.str();
     }
 
-    std::string map_end_message() {
+    std::string data_end_message() {
         boost::property_tree::ptree pt{};
-        pt.put(map_end_flag, true);
+        pt.put(data_end_flag, true);
 
         std::stringstream ss{};
         boost::property_tree::json_parser::write_json(ss, pt);
         return ss.str();
+    }
+
+
+    void send_end_message(const boost::asio::ip::tcp::endpoint &reduce_ep) {
+        boost::asio::io_service service;
+        boost::system::error_code ec;
+        boost::asio::ip::tcp::socket sock(service);
+        sock.connect(reduce_ep, ec);
+        sock.non_blocking(false);
+        if (ec)
+            throw std::runtime_error("cannot connect to node");
+        sock.wait(sock.wait_write);
+        boost::asio::write(sock, boost::asio::buffer(data_end_message()),
+                           boost::asio::transfer_all(),
+                           ec);
+        if (ec)
+            throw std::runtime_error("fail during writing to socket");
     }
 
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
@@ -70,8 +88,8 @@ namespace map_reduce {
         boost::property_tree::ptree pt{};
         boost::property_tree::json_parser::read_json(dynamic_cast<std::stringstream &>(std::stringstream{} << data),
                                                      pt);
-        if (pt.get(map_end_flag, false))
-            throw map_ended();
+        if (pt.get(data_end_flag, false))
+            throw data_ended_error();
         return {key_factory->create(pt.get("key", "")),
                 value_factory->create(pt.get("value", ""))};
     }

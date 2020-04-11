@@ -63,7 +63,7 @@ namespace map_reduce {
             auto[key, value] = get_key_value_from_json(json, cfg->key_out_factory, cfg->value_out_factory);
             std::lock_guard lg(map_mutex);
             key_values[std::move(key)].push_back(std::move(value));
-        } catch (map_ended &e) {
+        } catch (data_ended_error &e) {
             std::cout << "Map node sent all data" << std::endl;
             std::lock_guard lg(map_mutex);
             map_finished++;

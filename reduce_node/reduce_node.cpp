@@ -80,4 +80,5 @@ int main(int argc, char **argv) {
         thread.join();
 
     io_service.stop();
+    send_end_message(master_ep);
 }
