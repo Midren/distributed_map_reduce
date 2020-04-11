@@ -6,6 +6,7 @@
 #include <string>
 
 #include "../map_reduce.h"
+#include "../types/KeyValueType.h"
 
 namespace fs = std::filesystem;
 
@@ -18,9 +19,14 @@ int main() {
     fs::path map_input_file = home_dir / "distributed_map_reduce/example/input.csv";
     fs::path dll_path = home_dir / "distributed_map_reduce/example/build/libmap_reduce_config.so";
 
-    auto[key, value] = map_reduce::run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
-
-    std::cout << "The result of Map/Reduce is " << value->to_string() << std::endl;
+    auto res = map_reduce::run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
+    while (!res.empty()) {
+        auto[key, value] = std::move(
+                const_cast<std::pair<std::unique_ptr<map_reduce::KeyValueType>, std::unique_ptr<map_reduce::KeyValueType>> &>(res.back()));
+        std::cout << "The result of Map/Reduce is (" << key->to_string() << ", " << value->to_string() << ")"
+                  << std::endl;
+        res.pop_back();
+    }
 
     return 0;
 }
