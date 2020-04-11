@@ -4,6 +4,7 @@
 #ifndef MAP_REDUCE_REDUCE_SERVER_H
 #define MAP_REDUCE_REDUCE_SERVER_H
 
+#include <iostream>
 #include <boost/asio.hpp>
 #include <utility>
 
@@ -60,9 +61,7 @@ namespace map_reduce {
 
     private:
         void do_accept() {
-            std::cout << "Waiting for a new connection..." << std::endl;
             acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
-                std::cout << "Accepted connection" << std::endl;
                 if (!ec) {
                     std::make_shared<session>(std::move(socket_), json_handler)->start();
                 } else {

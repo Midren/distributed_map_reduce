@@ -100,16 +100,11 @@ namespace map_reduce {
         auto cfg = get_config(library_handler);
         auto future = get_result(cfg);
 
-        try {
-            ssh_init();
-            run_reduce_node(reduce_address, master_address, map_ips.size(), base_directory, dll_path);
-            run_map_nodes(map_ips, reduce_address, map_input_file, base_directory, dll_path);
-            ssh_finalize();
-        } catch (ssh::SshException &e) {
-            std::cerr << e.getError() << std::endl;
-        } catch (std::exception &e) {
-            std::cerr << e.what() << std::endl;
-        }
+        ssh_init();
+        run_reduce_node(reduce_address, master_address, map_ips.size(), base_directory, dll_path);
+        run_map_nodes(map_ips, reduce_address, map_input_file, base_directory, dll_path);
+        ssh_finalize();
+
         return future;
     }
 
