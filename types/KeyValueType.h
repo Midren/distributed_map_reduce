@@ -46,5 +46,22 @@ namespace map_reduce {
     using IntKeyValueType  = PrimitiveKeyValueType<int>;
     using DoubleKeyValueType = PrimitiveKeyValueType<double>;
     using LongKeyValueType = PrimitiveKeyValueType<long>;
+
+    class StringKeyValueType : public KeyValueType {
+    public:
+        StringKeyValueType() = default;
+
+        explicit StringKeyValueType(std::string str) : value(str) {}
+
+        void parse(const std::string &str) override {
+            value = str;
+        }
+
+        std::string to_string() const override {
+            return value;
+        }
+
+        std::string value;
+    };
 }
 #endif //MAP_REDUCE_KEYVALUETYPE_H
