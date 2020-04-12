@@ -31,6 +31,7 @@ EXPOSE 8001
 EXPOSE 8002
 
 RUN echo "export PATH=$PATH:/home/mapreduce/distributed_map_reduce/bin" >> /etc/environment
+RUN echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mapreduce/distributed_map_reduce/lib" >> /etc/environment
 
 RUN useradd -m mapreduce --create-home && \
     echo 'mapreduce:mapreduce' | chpasswd && \
@@ -50,4 +51,5 @@ WORKDIR /home/mapreduce
 
 ENTRYPOINT echo "mapreduce" | sudo -S service ssh restart && \
            export PATH=$PATH:/home/mapreduce/distributed_map_reduce/build/ && \
+           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mapreduce/distributed_map_reduce/lib  && \
            bash

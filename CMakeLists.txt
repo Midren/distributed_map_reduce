@@ -4,13 +4,13 @@ project(map_reduce CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 FIND_PACKAGE(libssh REQUIRED)
-FIND_PACKAGE(Boost COMPONENTS system filesystem program_options REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS system program_options REQUIRED)
 FIND_PACKAGE(Threads REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${LIBSSH_INCLUDE_DIRS})
 
-add_library(map_reduce STATIC map_reduce.cpp configurator/config.cpp types/KeyValueTypeFactory.cpp ssh/node.cpp ssh/scp.cpp util.cpp)
+add_library(map_reduce SHARED map_reduce.cpp configurator/config.cpp types/KeyValueTypeFactory.cpp ssh/node.cpp ssh/scp.cpp util.cpp)
 target_link_libraries(map_reduce PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} stdc++fs -ldl -lssh)
 
 add_executable(map_node map_node/map_node.cpp)

@@ -11,6 +11,6 @@ echo 'cd distributed_map_reduce && \
       cd ../example/sum_of_squares/ && \
       rm -rf build; mkdir build && cd build && \
       cmake .. && make -j4 && \
-      export LD_LIBRARY_PATH=$(pwd) && \
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd) && \
       ./example' | docker run -v $(pwd)/distributed_map_reduce/:/home/mapreduce/distributed_map_reduce -a stdin -a stdout -a stderr -i milishchuk/mapreduce:latest
 cd distributed_map_reduce
