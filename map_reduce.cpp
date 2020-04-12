@@ -72,18 +72,19 @@ namespace map_reduce {
     }
 
     void run_map_nodes(const std::vector<std::string> &map_ips, const std::string &reduce_address,
-                       const fs::path &map_input_file, const fs::path &base_directory, const fs::path &dll_path) {
+                       const std::vector<fs::path> &map_input_file, const fs::path &base_directory,
+                       const fs::path &dll_path) {
         auto[reduce_ip, reduce_port] = parse_ip_port(reduce_address);
         const fs::path map_node_path("map_node");
-        for (auto &map_ip: map_ips) {
-            ssh::node map_node(map_ip);
+        for (size_t i = 0; i < map_ips.size(); i++) {
+            ssh::node map_node(map_ips[i]);
             map_node.connect();
             send_config(map_node, base_directory, dll_path, "libmap_config.so");
             map_node.execute_command(
                     "cd " + ("~" / base_directory).string() +
                     "&& export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:" + ("~" / base_directory).string() +
                     "&& " + map_node_path.string() +
-                    " --input_file=" + map_input_file.string() +
+                    " --input_file=" + map_input_file[i].string() +
                     " --reduce_node_address=" + reduce_ip + ":" + std::to_string(reduce_port) +
                     " --config_file=libmap_config.so > map.out 2> map.err < /dev/null",
                     false);
@@ -93,7 +94,9 @@ namespace map_reduce {
     std::future<std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>>
     run_task(const std::vector<std::string> &map_ips, const std::string &reduce_address,
              const std::string &master_address,
-             const fs::path &map_input_file, const fs::path &dll_path) {
+             const std::vector<fs::path> &map_input_files, const fs::path &dll_path) {
+        if (map_ips.size() != map_input_files.size())
+            throw std::logic_error("Number of input files for map nodes should be the same as number of maps' ip");
         const fs::path base_directory = ".cache/mapreduce";
 
         auto library_handler = get_config_dll_handler(dll_path.filename());
@@ -102,7 +105,7 @@ namespace map_reduce {
 
         ssh_init();
         run_reduce_node(reduce_address, master_address, map_ips.size(), base_directory, dll_path);
-        run_map_nodes(map_ips, reduce_address, map_input_file, base_directory, dll_path);
+        run_map_nodes(map_ips, reduce_address, map_input_files, base_directory, dll_path);
         ssh_finalize();
 
         return future;
@@ -112,7 +115,7 @@ namespace map_reduce {
     std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>>
     run_task_blocking(const std::vector<std::string> &map_ips, const std::string &reduce_address,
                       const std::string &master_address,
-                      const fs::path &map_input_file, const fs::path &dll_path) {
+                      const std::vector<fs::path> &map_input_file, const fs::path &dll_path) {
         auto future = run_task(map_ips, reduce_address, master_address, map_input_file, dll_path);
         future.wait();
         return future.get();

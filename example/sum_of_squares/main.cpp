@@ -16,10 +16,13 @@ int main() {
     const std::string master_address = "172.17.0.7:8002";
 
     fs::path home_dir(getenv("HOME"));
-    fs::path map_input_file = home_dir / "distributed_map_reduce/example/sum_of_squares/input.csv";
+    std::vector<fs::path> map_input_files;
+    for (size_t i = 0; i < map_ips.size(); i++) {
+        map_input_files.emplace_back(home_dir / "distributed_map_reduce/example/sum_of_squares/input.csv");
+    }
     fs::path dll_path = home_dir / "distributed_map_reduce/example/sum_of_squares/build/libmap_reduce_config.so";
 
-    auto res = map_reduce::run_task_blocking(map_ips, reduce_address, master_address, map_input_file, dll_path);
+    auto res = map_reduce::run_task_blocking(map_ips, reduce_address, master_address, map_input_files, dll_path);
     std::cout << "The result of Map/Reduce is:" << std::endl;
     while (!res.empty()) {
         auto[key, value] = std::move(res.back());
