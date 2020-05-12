@@ -73,4 +73,4 @@ script, which launchs 4 map nodes, reduce node and master node to which result w
 
 ## Contributors
 
-Roman Milishchuk [@RomanMilishchuk](https://github.com/RomanMilishchuk)
+Roman Milishchuk [@Midren](https://github.com/Midren)
