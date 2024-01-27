@@ -82,17 +82,24 @@ namespace map_reduce {
             throw std::runtime_error("fail during writing to socket");
     }
 
+
     std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>
-    get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
-                            std::unique_ptr<KeyValueTypeFactory> &value_factory) {
-        boost::property_tree::ptree pt{};
-        boost::property_tree::json_parser::read_json(dynamic_cast<std::stringstream &>(std::stringstream{} << data),
-                                                     pt);
-        if (pt.get(data_end_flag, false))
-            throw data_ended_error();
-        return {key_factory->create(pt.get("key", "")),
-                value_factory->create(pt.get("value", ""))};
-    }
+	get_key_value_from_json(const std::string &data, std::unique_ptr<KeyValueTypeFactory> &key_factory,
+		std::unique_ptr<KeyValueTypeFactory> &value_factory) {
+    boost::property_tree::ptree pt{};
+
+    std::stringstream ss(data);
+
+    boost::property_tree::json_parser::read_json(ss, pt);
+
+    if (pt.get(data_end_flag, false))
+        throw data_ended_error();
+
+    return {key_factory->create(pt.get("key", "")),
+            value_factory->create(pt.get("value", ""))};
+}
+
+
 
     std::string
     to_csv(const std::vector<std::pair<std::unique_ptr<KeyValueType>, std::unique_ptr<KeyValueType>>> &key_values,
