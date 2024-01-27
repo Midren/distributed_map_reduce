@@ -83,13 +83,16 @@ namespace ssh {
     void node::scp_send_file(const std::filesystem::path &from, const std::filesystem::path &to) {
         std::ifstream input(from, std::ifstream::binary);
         if (input.is_open()) {
-            std::string data = dynamic_cast<std::ostringstream &>(std::ostringstream{} << input.rdbuf()).str();
+            std::ostringstream buffer;
+            buffer << input.rdbuf();
+            std::string data = buffer.str();
             input.close();
             scp_write_file(to, data);
         } else {
             throw std::runtime_error("Cannot find a file");
         }
-    };
+   }
+
 
     void node::scp_download_file(const std::filesystem::path &from, const std::filesystem::path &to) {
         std::string input = scp_read_file(from);
